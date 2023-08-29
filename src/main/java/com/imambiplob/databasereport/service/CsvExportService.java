@@ -13,11 +13,10 @@ public class CsvExportService {
     public void exportQueryResultToCsv(List<Object[]> results, String filePath, Object[] columns) {
 
         try (CSVWriter csvWriter = new CSVWriter(new FileWriter(filePath))) {
-            Object[] firstRow = columns;
-            if (firstRow != null) {
-                String[] columnNames = new String[firstRow.length];
-                for (int i = 0; i < firstRow.length; i++) {
-                    columnNames[i] = String.valueOf(firstRow[i]);  // Writing column names
+            if (columns != null) {
+                String[] columnNames = new String[columns.length];
+                for (int i = 0; i < columns.length; i++) {
+                    columnNames[i] = String.valueOf(columns[i]);  // Writing column names
                 }
                 csvWriter.writeNext(columnNames);
             }

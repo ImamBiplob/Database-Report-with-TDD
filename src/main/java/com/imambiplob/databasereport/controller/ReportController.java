@@ -4,6 +4,7 @@ import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.service.ReportService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,14 +19,17 @@ public class ReportController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ReportDTO addReport(@RequestBody Report report) {
-        return reportService.addReport(report);
+    public ResponseEntity<?> addReport(@RequestBody Report report) {
+        if(report.getQuery().toLowerCase().contains("drop"))
+            return new ResponseEntity<>("DON'T YOU DARE DROP THAT!!!", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(reportService.addReport(report), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ReportDTO getReport(@PathVariable long id) {
-        return reportService.getReport(id);
+    public ResponseEntity<?> getReport(@PathVariable long id) {
+        if(reportService.getReport(id) == null)
+            return new ResponseEntity<>("Report with ID: " + id + "doesn't exist", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(reportService.getReport(id), HttpStatus.OK);
     }
 
     @GetMapping
@@ -34,7 +38,10 @@ public class ReportController {
     }
 
     @GetMapping("/run/{id}")
-    public List<Object[]> getResult(@PathVariable long id) {
-        return reportService.getResultForQuery(id);
+    public ResponseEntity<?> getResult(@PathVariable long id) {
+        List<Object[]> resultList = reportService.getResultForQuery(id);
+        if(resultList == null)
+            return new ResponseEntity<>("Report with ID: " + id + "doesn't exist", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 }

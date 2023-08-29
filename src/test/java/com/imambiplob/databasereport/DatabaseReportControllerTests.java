@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +42,7 @@ public class DatabaseReportControllerTests {
 
     @Test
     @DisplayName("Test for Successful POST Operation of Report")
-    public void saveReport() throws Exception {
+    public void saveReportWithSuccess() throws Exception {
 
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
@@ -62,8 +63,25 @@ public class DatabaseReportControllerTests {
     }
 
     @Test
+    @DisplayName("Test for Unsuccessful POST Operation of Report with DROP SQL Statement")
+    public void saveReportWithDropStatement() throws Exception {
+
+        Report report = Report.builder().reportName("DROP this fu*king Database")
+                .query("Drop database")
+                .build();
+
+        ResultActions response = mockMvc.perform(post("/api/reports")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(report)));
+
+        response.andDo(print()).
+                andExpect(status().isBadRequest());
+
+    }
+
+    @Test
     @DisplayName("Test for Successful GET Operation of Reports")
-    public void getReports() throws Exception {
+    public void getReportsWithSuccess() throws Exception {
 
         Report report1 = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
@@ -86,8 +104,14 @@ public class DatabaseReportControllerTests {
         ResultActions response = mockMvc.perform(get("/api/reports"));
 
         response.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print());
 
     }
+
+    // get report success
+    // get report fail
+    // run report success
+    // run report fail
 
 }
