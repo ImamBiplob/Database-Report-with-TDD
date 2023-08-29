@@ -92,7 +92,7 @@ public class DatabaseReportServiceTests {
     // get result success
     @Test
     @DisplayName("Test for Successful Run of a Report")
-    public void runReportOfValidReport() {
+    public void runReportWithValidId() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
@@ -111,7 +111,7 @@ public class DatabaseReportServiceTests {
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Non-existing ID")
-    public void runReportOfInvalidReport() {
+    public void runReportWithInvalidId() {
         List<Object[]> results = reportService.getResultForQuery(10000000L);
 
         Assertions.assertNull(results);    // If report doesn't exist, result will be null
@@ -121,7 +121,7 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Unsuccessful Run of a Report with Invalid SQL")
     public void runReportOfInvalidSQL() {
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employee")  // No table named employee
+                .query("select first_name, job_title, salary from employee")  // No table named employee in database
                 .columns("first_name,job_title,salary")
                 .build();
 
@@ -137,7 +137,7 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Unsuccessful Run of a Report with Malformed SQL")
     public void runReportOfMalformedSQL() {
         Report report = Report.builder().reportName("All Employees")
-                .query("slect first_name, job_title, salary from employees")  // No statement named slect
+                .query("slect first_name, job_title, salary from employees")  // No statement named slect in SQL
                 .columns("first_name,job_title,salary")
                 .build();
 
@@ -148,4 +148,9 @@ public class DatabaseReportServiceTests {
         Assertions.assertThrows(GenericJDBCException.class, () -> reportService.getResultForQuery(report.getId()));
 
     }
+
+    // edit success
+    // edit fail
+    // delete success
+    // delete fail
 }

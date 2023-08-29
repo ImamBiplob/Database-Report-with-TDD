@@ -23,6 +23,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
+    // Handling custom illegal query exception
+    @ExceptionHandler(IllegalQueryException.class)
+    public ResponseEntity<?> customIllegalQueryExceptionHandling(IllegalQueryException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "You Have Given Prohibited Query!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handling custom report not found exception
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ResponseEntity<?> customReportNotFoundExceptionHandling(ReportNotFoundException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Report Not Found!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
     // Handling custom Malformed SQL Exception
     @ExceptionHandler(GenericJDBCException.class)
     public ResponseEntity<?> customMalformedSQLExceptionHandling(GenericJDBCException exception) {

@@ -17,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -57,8 +57,9 @@ public class DatabaseReportControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(report)));
 
-        response.andDo(print()).
-                andExpect(status().isCreated());
+        response.andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
 
     }
 
@@ -110,8 +111,39 @@ public class DatabaseReportControllerTests {
     }
 
     // get report success
+    @Test
+    @DisplayName("Test for Successful GET of a Report")
+    public void getReportWithSuccess() throws Exception {
+        Report report = Report.builder().reportName("All Employees")
+                .query("select first_name, job_title, salary from employees")
+                .columns("first_name,job_title,salary")
+                .build();
+
+        reportRepository.save(report);
+
+        ResultActions response = mockMvc.perform(get("/api/reports/{id}", report.getId()));
+
+        response.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print())
+                .andExpect(jsonPath("$.reportName", is(report.getReportName())));
+    }
+
     // get report fail
+    @Test
+    @DisplayName("Test for Unsuccessful GET of a Report with Non-existing ID")
+    public void getReportWithInvalidId() throws  Exception {
+        ResultActions response = mockMvc.perform(get("/api/reports/{id}", 100000L));
+
+        response.andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
+    }
     // run report success
-    // run report fail
+    // run report fail*3
+    // edit success
+    // edit fail
+    // delete success
+    // delete fail
 
 }

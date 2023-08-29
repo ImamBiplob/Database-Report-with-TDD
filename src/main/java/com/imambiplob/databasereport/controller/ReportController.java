@@ -2,6 +2,8 @@ package com.imambiplob.databasereport.controller;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
+import com.imambiplob.databasereport.exception.IllegalQueryException;
+import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.service.ReportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +21,18 @@ public class ReportController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addReport(@RequestBody Report report) {
+    public ResponseEntity<?> addReport(@RequestBody Report report) throws IllegalQueryException {
         if(report.getQuery().toLowerCase().contains("drop"))
-            return new ResponseEntity<>("DON'T YOU DARE DROP THAT!!!", HttpStatus.BAD_REQUEST);
+            throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
+
         return new ResponseEntity<>(reportService.addReport(report), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getReport(@PathVariable long id) {
+    public ResponseEntity<?> getReport(@PathVariable long id) throws ReportNotFoundException {
         if(reportService.getReport(id) == null)
-            return new ResponseEntity<>("Report with ID: " + id + "doesn't exist", HttpStatus.NOT_FOUND);
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
         return new ResponseEntity<>(reportService.getReport(id), HttpStatus.OK);
     }
 
@@ -38,10 +42,10 @@ public class ReportController {
     }
 
     @GetMapping("/run/{id}")
-    public ResponseEntity<?> getResult(@PathVariable long id) {
-        List<Object[]> resultList = reportService.getResultForQuery(id);
-        if(resultList == null)
-            return new ResponseEntity<>("Report with ID: " + id + "doesn't exist", HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
+    public ResponseEntity<?> getResult(@PathVariable long id) throws ReportNotFoundException {
+        if(reportService.getReport(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        return new ResponseEntity<>(reportService.getResultForQuery(id), HttpStatus.OK);
     }
 }

@@ -58,9 +58,6 @@ public class ReportService {
     public List<Object[]> getResultForQuery(long id) {
         Report report = reportRepository.findReportById(id);
 
-        if(report == null)
-            return null;     // Not found
-
         Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
         String filePath = "reports/" + report.getReportName() + ".csv";
 
