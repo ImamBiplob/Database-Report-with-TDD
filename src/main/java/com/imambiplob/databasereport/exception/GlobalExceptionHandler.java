@@ -37,10 +37,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    // Handling custom Malformed SQL Exception
+    // Handling custom Malformed SQL Statement Exception
     @ExceptionHandler(GenericJDBCException.class)
-    public ResponseEntity<?> customMalformedSQLExceptionHandling(GenericJDBCException exception) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Malformed SQL!!! Edit Report with Correct SQL Syntax and Try Again", exception.getMessage());
+    public ResponseEntity<?> customMalformedSQLStatementExceptionHandling(GenericJDBCException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Malformed SQL Statement!!! Edit Report with Correct SQL Statement and Try Again", exception.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
@@ -48,6 +48,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLGrammarException.class)
     public ResponseEntity<?> customInvalidSQLExceptionHandling(SQLGrammarException exception) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid SQL!!! Edit Report with Valid SQL and Try Again", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handling custom Illegal Argument Exception
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> customWrongQueryParameterExceptionHandling(IllegalArgumentException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Parameter Error!!! Edit Report with Valid Parameter Name and Value Before Trying Again", exception.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 

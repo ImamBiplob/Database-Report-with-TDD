@@ -39,19 +39,33 @@ public class ReportService {
         return reportDTO;
     }
 
-    @Transactional
-    public ReportDTO addReport(Report report) {
-        return convertReportToReportDTO(reportRepository.save(report));
+    public static Report convertReportDTOToReport(ReportDTO reportDTO) {
+        if(reportDTO == null) {
+            return null;
+        }
+        Report report = new Report();
+        report.setId(reportDTO.getId());
+        report.setReportName(reportDTO.getReportName());
+        report.setQuery(reportDTO.getQuery());
+        report.setColumns(reportDTO.getColumns());
+        report.setParamsMap(reportDTO.getParamsMap());
+
+        return report;
     }
 
-    public ReportDTO getReport(long id) {
-        return convertReportToReportDTO(reportRepository.findReportById(id));
+    @Transactional
+    public ReportDTO addReport(ReportDTO reportDTO) {
+        return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO)));
     }
 
     public List<ReportDTO> getReports() {
         return reportRepository.findAll().stream()
                 .map(ReportService::convertReportToReportDTO)
                 .collect(Collectors.toList());
+    }
+
+    public ReportDTO getReportById(long id) {
+        return convertReportToReportDTO(reportRepository.findReportById(id));
     }
 
     @Transactional
@@ -73,5 +87,24 @@ public class ReportService {
         csvExportService.exportQueryResultToCsv(results, filePath, columns);
 
         return results;
+    }
+
+    public ReportDTO updateReport(ReportDTO reportDTO, long id) {
+        Report report = reportRepository.findReportById(id);
+
+        report.setReportName(reportDTO.getReportName());
+        report.setQuery(reportDTO.getQuery());
+        report.setColumns(reportDTO.getColumns());
+        report.setParamsMap(reportDTO.getParamsMap());
+
+        return convertReportToReportDTO(reportRepository.save(report));
+    }
+
+    public ReportDTO deleteReport(long id) {
+        ReportDTO reportDTO = convertReportToReportDTO(reportRepository.findReportById(id));
+
+        reportRepository.deleteById(id);
+
+        return reportDTO;
     }
 }

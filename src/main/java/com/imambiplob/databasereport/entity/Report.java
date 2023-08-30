@@ -1,6 +1,7 @@
 package com.imambiplob.databasereport.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +20,10 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank
     private String reportName;
 
+    @NotBlank
     private String query;
 
     private String columns;

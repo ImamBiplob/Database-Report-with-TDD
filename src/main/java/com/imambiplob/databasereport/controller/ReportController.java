@@ -1,10 +1,10 @@
 package com.imambiplob.databasereport.controller;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
-import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.service.ReportService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,19 +21,11 @@ public class ReportController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addReport(@RequestBody Report report) throws IllegalQueryException {
-        if(report.getQuery().toLowerCase().contains("drop"))
+    public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {
+        if(reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
-        return new ResponseEntity<>(reportService.addReport(report), HttpStatus.CREATED);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getReport(@PathVariable long id) throws ReportNotFoundException {
-        if(reportService.getReport(id) == null)
-            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
-
-        return new ResponseEntity<>(reportService.getReport(id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.addReport(reportDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -41,11 +33,35 @@ public class ReportController {
         return reportService.getReports();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getReportById(@PathVariable long id) throws ReportNotFoundException {
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        return new ResponseEntity<>(reportService.getReportById(id), HttpStatus.OK);
+    }
+
     @GetMapping("/run/{id}")
-    public ResponseEntity<?> getResult(@PathVariable long id) throws ReportNotFoundException {
-        if(reportService.getReport(id) == null)
+    public ResponseEntity<?> runReport(@PathVariable long id) throws ReportNotFoundException {
+        if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
         return new ResponseEntity<>(reportService.getResultForQuery(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReport(@Valid @RequestBody ReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException {
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        return new ResponseEntity<>(reportService.updateReport(reportDTO, id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteReport(@PathVariable long id) throws ReportNotFoundException {
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        return new ResponseEntity<>(reportService.deleteReport(id), HttpStatus.OK);
     }
 }

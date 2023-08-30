@@ -2,6 +2,7 @@ package com.imambiplob.databasereport;
 
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.repository.ReportRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,16 @@ public class DatabaseReportRepositoryTests {
     }
 
     @Test
+    @DisplayName("Test for Unsuccessful Save of a Report Not Fulfilling Constraint")
+    public void saveReportWithFailure() {
+        Report report = Report.builder().reportName("Unnamed")
+                .query("")
+                .build();
+
+        Assertions.assertThrows(ConstraintViolationException.class, () -> reportRepository.save(report), "Report should not be saved due to constraint violation");
+    }
+
+    @Test
     @DisplayName("Test for Successful Find of a Report with Existing ID")
     public void findReportWithValidId() {
         Report report = Report.builder().reportName("All Employees")
@@ -60,9 +71,40 @@ public class DatabaseReportRepositoryTests {
 
     }
 
-    // post fail
-    // edit success
-    // edit fail
-    // delete success
-    // delete fail
+    @Test
+    @DisplayName("Test for Successful Update of a Report")
+    public void updateReportWithValidId() {
+        Report report = Report.builder().reportName("All Employees")
+                .query("select first_name, job_title, salary from employees")
+                .columns("first_name,job_title,salary")
+                .build();
+
+        reportRepository.save(report);
+
+        Report savedReport = reportRepository.findReportById(report.getId());
+
+        savedReport.setReportName("All Junior Executives");
+        savedReport.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
+
+        Report updatedReport = reportRepository.save(savedReport);
+
+        Assertions.assertEquals(savedReport.getId(), updatedReport.getId());
+        Assertions.assertEquals("All Junior Executives", updatedReport.getReportName());
+
+    }
+
+    @Test
+    @DisplayName("Test for Successful Delete of a Report")
+    public void deleteReportWithValidId() {
+        Report report = Report.builder().reportName("All Employees")
+                .query("select first_name, job_title, salary from employees")
+                .columns("first_name,job_title,salary")
+                .build();
+
+        reportRepository.save(report);
+
+        reportRepository.deleteById(report.getId());
+
+        Assertions.assertNull(reportRepository.findReportById(report.getId()), "Report should not exist since it's deleted");
+    }
 }
