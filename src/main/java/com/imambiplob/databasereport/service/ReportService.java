@@ -7,6 +7,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
+
     @PersistenceContext
     private EntityManager entityManager;
     private final ReportRepository reportRepository;
@@ -26,9 +29,11 @@ public class ReportService {
     }
 
     public static ReportDTO convertReportToReportDTO(Report report) {
+
         if(report == null) {
             return null;
         }
+
         ReportDTO reportDTO = new ReportDTO();
         reportDTO.setId(report.getId());
         reportDTO.setReportName(report.getReportName());
@@ -37,12 +42,15 @@ public class ReportService {
         reportDTO.setParamsMap(report.getParamsMap());
 
         return reportDTO;
+
     }
 
     public static Report convertReportDTOToReport(ReportDTO reportDTO) {
+
         if(reportDTO == null) {
             return null;
         }
+
         Report report = new Report();
         report.setId(reportDTO.getId());
         report.setReportName(reportDTO.getReportName());
@@ -51,25 +59,59 @@ public class ReportService {
         report.setParamsMap(reportDTO.getParamsMap());
 
         return report;
+
     }
 
     @Transactional
     public ReportDTO addReport(ReportDTO reportDTO) {
+
         return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO)));
+
     }
 
     public List<ReportDTO> getReports() {
+
         return reportRepository.findAll().stream()
                 .map(ReportService::convertReportToReportDTO)
                 .collect(Collectors.toList());
+
+    }
+
+    public List<ReportDTO> findReportsWithSorting(String field) {
+
+        return  reportRepository.findAll(Sort.by(Sort.Direction.ASC, field)).stream()
+                .map(ReportService::convertReportToReportDTO)
+                .collect(Collectors.toList());
+
+    }
+
+    public List<ReportDTO> findReportsWithPagination(int offset, int pageSize) {
+
+        return reportRepository.findAll(PageRequest.of(offset, pageSize))
+                .getContent().stream()
+                .map(ReportService::convertReportToReportDTO)
+                .collect(Collectors.toList());
+
+    }
+
+    public List<ReportDTO> findReportsWithPaginationAndSorting(int offset, int pageSize, String field) {
+
+        return reportRepository.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by(field)))
+                .getContent().stream()
+                .map(ReportService::convertReportToReportDTO)
+                .collect(Collectors.toList());
+
     }
 
     public ReportDTO getReportById(long id) {
+
         return convertReportToReportDTO(reportRepository.findReportById(id));
+
     }
 
     @Transactional
     public List<Object[]> getResultForQuery(long id) {
+
         Report report = reportRepository.findReportById(id);
 
         Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
@@ -87,9 +129,11 @@ public class ReportService {
         csvExportService.exportQueryResultToCsv(results, filePath, columns);
 
         return results;
+
     }
 
     public ReportDTO updateReport(ReportDTO reportDTO, long id) {
+
         Report report = reportRepository.findReportById(id);
 
         report.setReportName(reportDTO.getReportName());
@@ -98,13 +142,28 @@ public class ReportService {
         report.setParamsMap(reportDTO.getParamsMap());
 
         return convertReportToReportDTO(reportRepository.save(report));
+
     }
 
     public ReportDTO deleteReport(long id) {
+
         ReportDTO reportDTO = convertReportToReportDTO(reportRepository.findReportById(id));
 
         reportRepository.deleteById(id);
 
         return reportDTO;
+
     }
+
+    public String deleteAllReports() {
+
+        if(reportRepository.count() > 0) {
+            reportRepository.deleteAll();
+            return "All Reports Have Been DELETED!!!";
+        }
+
+        return "It's Already Empty!!!";
+
+    }
+
 }

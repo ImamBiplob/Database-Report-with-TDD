@@ -49,6 +49,7 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertNotNull(addedReport, "Report should be added");
         Assertions.assertEquals(reportDTO.getReportName(), addedReport.getReportName());
+        
     }
 
     @Test
@@ -58,19 +59,20 @@ public class DatabaseReportServiceTests {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
-        ReportDTO reportDTO = ReportDTO.builder().reportName("")            // No report name
+        ReportDTO reportDTO = ReportDTO.builder().reportName("")            /* No report name */
                 .query("select first_name, job_title, salary from employees where salary > :salary")
                 .columns("first_name,job_title,salary")
                 .paramsMap(paramsMap)
                 .build();
 
         Assertions.assertThrows(ConstraintViolationException.class, () -> reportService.addReport(reportDTO));
+        
     }
-
-    // get report success
+    
     @Test
     @DisplayName("Test for Successful Retrieve of a Report")
     public void retrieveReportWithSuccess() {
+        
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -82,9 +84,9 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertNotNull(retrievedReport, "Report should be retrieved");
         Assertions.assertEquals(report.getReportName(), retrievedReport.getReportName());
+        
     }
-
-    // get report fail
+    
     @Test
     @DisplayName("Test for Unsuccessful Retrieve of a Report with Non-existing ID")
     public void retrieveReportWithInvalidId() {
@@ -94,22 +96,23 @@ public class DatabaseReportServiceTests {
         Assertions.assertNull(retrievedReport, "Report of Id 100000 should not exist");
 
     }
-
-    // get reports success
+    
     @Test
     @DisplayName("Test for Successful Retrieve of Reports")
     public void retrieveReportsWithSuccess() {
 
         List<ReportDTO> retrievedReports = reportService.getReports();
 
-        Assertions.assertNotNull(retrievedReports);  // If there is no reports, it will return empty list.
-                                                    // That's why it's always not null.
-    }
+        Assertions.assertNotNull(retrievedReports);
 
-    // get result success
+        /* If there is no reports, it will return empty list. That's why it's always not null. */
+        
+    }
+    
     @Test
     @DisplayName("Test for Successful Run of a Report")
     public void runReportWithValidId() {
+        
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
@@ -123,26 +126,32 @@ public class DatabaseReportServiceTests {
 
         List<Object[]> results = reportService.getResultForQuery(report.getId());
 
-        Assertions.assertNotNull(results);    // If report exists and sql is valid, result will not be null
+        Assertions.assertNotNull(results);          /* If report exists and sql is valid, result will not be null */
+        
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Non-existing ID")
     public void runReportWithInvalidId() {
-        Assertions.assertThrows(NullPointerException.class, () -> reportService.getResultForQuery(10000000L));  // If report doesn't exist, there will be null pointer exception
+
+        /* If report doesn't exist, there will be null pointer exception */
+        
+        Assertions.assertThrows(NullPointerException.class, () -> reportService.getResultForQuery(10000000L));
+        
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Invalid SQL")
     public void runReportOfInvalidSQL() {
+        
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employee")  // No table named employee in database
+                .query("select first_name, job_title, salary from employee")      /* No table named employee in database */
                 .columns("first_name,job_title,salary")
                 .build();
 
         reportRepository.save(report);
 
-        //List<Object[]> results = reportService.getResultForQuery(report.getId());  // It will throw an exception due to invalid SQL
+        /* It will throw an exception due to invalid SQL */
 
         Assertions.assertThrows(SQLGrammarException.class, () -> reportService.getResultForQuery(report.getId()));
 
@@ -151,14 +160,15 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Malformed SQL Statement")
     public void runReportOfMalformedSQLStatement() {
+        
         Report report = Report.builder().reportName("All Employees")
-                .query("slect first_name, job_title, salary from employees")  // No statement named slect in SQL
+                .query("slect first_name, job_title, salary from employees")      /* No statement named slect in SQL */
                 .columns("first_name,job_title,salary")
                 .build();
 
         reportRepository.save(report);
 
-        //List<Object[]> results = reportService.getResultForQuery(report.getId());  // It will throw an exception due to malformed SQL statement
+        /* It will throw an exception due to malformed SQL statement */
 
         Assertions.assertThrows(GenericJDBCException.class, () -> reportService.getResultForQuery(report.getId()));
 
@@ -167,24 +177,28 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Parameter Error")
     public void runReportOfWrongfulParameter() {
+        
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
         Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
-                .query("select first_name, job_title, salary from employees where salary > :salay")     // salay doesn't match with paramName salary
+                .query("select first_name, job_title, salary from employees where salary > :salay")     /* salay doesn't match with paramName salary */
                 .columns("first_name,job_title,salary")
                 .paramsMap(paramsMap)
                 .build();
 
         reportRepository.save(report);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.getResultForQuery(report.getId()));  // couldn't set parameter due to mismatched parameter names
+        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.getResultForQuery(report.getId()));
+
+        /* Couldn't set parameter due to mismatched parameter names */
 
     }
 
     @Test
     @DisplayName("Test for Successful Update of a Report")
     public void updateReportWithValidId() {
+        
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -207,6 +221,7 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Successful Delete of a Report")
     public void deleteReportWithValidId() {
+        
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -217,5 +232,24 @@ public class DatabaseReportServiceTests {
         ReportDTO deletedReport = reportService.deleteReport(report.getId());
 
         Assertions.assertNull(reportRepository.findReportById(deletedReport.getId()), "Report should not exist since it's deleted");
+        
     }
+
+    @Test
+    @DisplayName("Test for Successful Delete of All Reports")
+    public void deleteAllReportsWithSuccess() {
+        
+        Report report = Report.builder().reportName("All Employees")
+                .query("select first_name, job_title, salary from employees")
+                .columns("first_name,job_title,salary")
+                .build();
+
+        reportRepository.save(report);
+
+        reportService.deleteAllReports();
+
+        Assertions.assertEquals(0, reportRepository.count());
+        
+    }
+
 }

@@ -73,7 +73,7 @@ public class DatabaseReportControllerTests {
         paramsMap.put("salary", "100000");
 
         ReportDTO reportDTO = ReportDTO.builder().reportName("All Employees Where Salary is Getter Than 100000")
-                .query("")                                  // No SQL Query
+                .query("")                                                       /* No SQL Query */
                 .columns("first_name,job_title,salary")
                 .paramsMap(paramsMap)
                 .build();
@@ -140,6 +140,7 @@ public class DatabaseReportControllerTests {
     @Test
     @DisplayName("Test for Successful GET of a Report")
     public void getReportWithSuccess() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -153,21 +154,25 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(jsonPath("$.reportName", is(report.getReportName())));
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful GET of a Report with Non-existing ID")
     public void getReportWithInvalidId() throws  Exception {
+
         ResultActions response = mockMvc.perform(get("/api/reports/{id}", 100000L));
 
         response.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
+
     }
 
     @Test
     @DisplayName("Test for Successful Run of a Report")
     public void runReportWithSuccess() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -180,23 +185,27 @@ public class DatabaseReportControllerTests {
         response.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print());
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Non-existing ID")
     public void runReportWithInvalidId() throws Exception {
+
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", 1010000L));
 
         response.andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print());
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Invalid SQL")
     public void runReportWithInvalidSQL() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, kob_title, salary from employees") // No column named 'kob_title' in employees table
+                .query("select first_name, kob_title, salary from employees")     /* No column named 'kob_title' in employees table */
                 .columns("first_name,job_title,salary")
                 .build();
 
@@ -208,13 +217,15 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Invalid SQL!!! Edit Report with Valid SQL and Try Again")));
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Wrong SQL Syntax")
     public void runReportWithWrongSQLSyntax() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary frm employees") // Wrong SQl keyword 'frm'
+                .query("select first_name, job_title, salary frm employees")     /* Wrong SQl keyword 'frm' */
                 .columns("first_name,job_title,salary")
                 .build();
 
@@ -226,13 +237,15 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Invalid SQL!!! Edit Report with Valid SQL and Try Again")));
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Malformed SQL Statement")
     public void runReportWithMalformedSQLStatement() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
-                .query("slect first_name, job_title, salary from employees") // Malformed SQl statement 'slect'
+                .query("slect first_name, job_title, salary from employees")    /* Malformed SQl statement 'slect' */
                 .columns("first_name,job_title,salary")
                 .build();
 
@@ -244,13 +257,15 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Malformed SQL Statement!!! Edit Report with Correct SQL Statement and Try Again")));
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Parameter Error")
     public void runReportWithMismatchedParameterNames() throws Exception {
+
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("salry", "100000");    // salry doesn't match with param salary
+        paramsMap.put("salry", "100000");                                       /* salry doesn't match with param salary */
 
         Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
                 .query("select first_name, job_title, salary from employees where salary > :salary")
@@ -272,6 +287,7 @@ public class DatabaseReportControllerTests {
     @Test
     @DisplayName("Test  for Successful Update of a Report")
     public void updateReportWithValidId() throws Exception {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -279,7 +295,7 @@ public class DatabaseReportControllerTests {
 
         Report savedReport = reportRepository.save(report);
 
-        ReportDTO reportDTO = ReportDTO.builder()
+        ReportDTO updatedReport = ReportDTO.builder()
                 .reportName("All Junior Executives")
                 .query("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"")
                 .columns("first_name,job_title,salary")
@@ -287,7 +303,7 @@ public class DatabaseReportControllerTests {
 
         ResultActions response = mockMvc.perform(put("/api/reports/{id}", savedReport.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(reportDTO)));
+                .content(objectMapper.writeValueAsString(updatedReport)));
 
         response.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -299,19 +315,50 @@ public class DatabaseReportControllerTests {
     @Test
     @DisplayName("Test for Successful Delete of a Report")
     public void deleteReportWithValidId() throws Exception {
-        Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
+
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("salary", "100000");
+
+        Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
+                .query("select first_name, job_title, salary from employees where salary > :salary")
                 .columns("first_name,job_title,salary")
+                .paramsMap(paramsMap)
                 .build();
 
-        Report toBeDeletedReport = reportRepository.save(report);
+        Report toBeDeleted = reportRepository.save(report);
 
-        ResultActions response = mockMvc.perform(delete("/api/reports/{id}", toBeDeletedReport.getId()));
+        ResultActions response = mockMvc.perform(delete("/api/reports/{id}", toBeDeleted.getId()));
+
+        response.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print());
+
+        Assertions.assertNull(reportRepository.findReportById(toBeDeleted.getId()), "Report should not exist since it's deleted");
+
+    }
+
+    @Test
+    @DisplayName("Test for Successful Delete of All reports")
+    public void deleteAllReportsWithSuccess() throws Exception {
+
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("salary", "100000");
+
+        Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
+                .query("select first_name, job_title, salary from employees where salary > :salary")
+                .columns("first_name,job_title,salary")
+                .paramsMap(paramsMap)
+                .build();
+
+        Report toBeDeleted = reportRepository.save(report);
+
+        ResultActions response = mockMvc.perform(delete("/api/reports/deleteAll"));
 
         response.andExpect(status().isOk())
                 .andDo(print());
 
-        //Assertions.assertNull(reportRepository.findReportById(report.getId(), "lo"));
+        Assertions.assertNull(reportRepository.findReportById(toBeDeleted.getId()), "Report should not exist since it's deleted");
+
     }
 
 }

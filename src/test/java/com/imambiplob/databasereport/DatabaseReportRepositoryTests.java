@@ -26,6 +26,7 @@ public class DatabaseReportRepositoryTests {
     @Test
     @DisplayName("Test for Successful Save of a Report")
     public void saveReportWithSuccess() {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -34,21 +35,25 @@ public class DatabaseReportRepositoryTests {
         Report savedReport = reportRepository.save(report);
 
         Assertions.assertNotNull(savedReport, "Report should be saved");
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Save of a Report Not Fulfilling Constraint")
     public void saveReportWithFailure() {
+
         Report report = Report.builder().reportName("Unnamed")
                 .query("")
                 .build();
 
         Assertions.assertThrows(ConstraintViolationException.class, () -> reportRepository.save(report), "Report should not be saved due to constraint violation");
+
     }
 
     @Test
     @DisplayName("Test for Successful Find of a Report with Existing ID")
     public void findReportWithValidId() {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -59,6 +64,7 @@ public class DatabaseReportRepositoryTests {
         Optional<Report> retrievedReport = reportRepository.findById(savedReport.getId());
 
         Assertions.assertNotNull(retrievedReport, "Report should be retrieved");
+
     }
 
     @Test
@@ -74,6 +80,7 @@ public class DatabaseReportRepositoryTests {
     @Test
     @DisplayName("Test for Successful Update of a Report")
     public void updateReportWithValidId() {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -96,6 +103,7 @@ public class DatabaseReportRepositoryTests {
     @Test
     @DisplayName("Test for Successful Delete of a Report")
     public void deleteReportWithValidId() {
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -106,5 +114,7 @@ public class DatabaseReportRepositoryTests {
         reportRepository.deleteById(report.getId());
 
         Assertions.assertNull(reportRepository.findReportById(report.getId()), "Report should not exist since it's deleted");
+
     }
+
 }

@@ -25,4 +25,5 @@ public class ReportDTO {
     private String columns;
 
     private Map<String, String> paramsMap;
+
 }
