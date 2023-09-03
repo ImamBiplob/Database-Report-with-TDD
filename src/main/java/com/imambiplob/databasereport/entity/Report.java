@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
@@ -20,10 +21,10 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank
+    @NotBlank(message = "Report Name must not be blank")
     private String reportName;
 
-    @NotBlank
+    @NotBlank(message = "Query must not be blank")
     private String query;
 
     private String columns;
@@ -34,5 +35,13 @@ public class Report {
     @MapKeyColumn(name = "param_name")
     @Column(name = "param_value")
     private Map<String, String> paramsMap;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private LocalDateTime creationTime = LocalDateTime.now();
+
+    private LocalDateTime lastUpdateTime;
 
 }

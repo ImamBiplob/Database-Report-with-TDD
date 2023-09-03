@@ -2,7 +2,9 @@ package com.imambiplob.databasereport.service;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
+import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.ReportRepository;
+import com.imambiplob.databasereport.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,10 +24,13 @@ public class ReportService {
     @PersistenceContext
     private EntityManager entityManager;
     private final ReportRepository reportRepository;
+
+    private final UserRepository userRepository;
     private final CsvExportService csvExportService;
 
-    public ReportService(ReportRepository reportRepository, CsvExportService csvExportService) {
+    public ReportService(ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService) {
         this.reportRepository = reportRepository;
+        this.userRepository = userRepository;
         this.csvExportService = csvExportService;
     }
 
@@ -40,12 +46,15 @@ public class ReportService {
         reportDTO.setQuery(report.getQuery());
         reportDTO.setColumns(report.getColumns());
         reportDTO.setParamsMap(report.getParamsMap());
+        reportDTO.setUsername(report.getUser().getUsername());
+        reportDTO.setCreationTime(report.getCreationTime());
+        reportDTO.setLastUpdateTime(report.getLastUpdateTime());
 
         return reportDTO;
 
     }
 
-    public static Report convertReportDTOToReport(ReportDTO reportDTO) {
+    public static Report convertReportDTOToReport(ReportDTO reportDTO, User user) {
 
         if(reportDTO == null) {
             return null;
@@ -57,6 +66,7 @@ public class ReportService {
         report.setQuery(reportDTO.getQuery());
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
+        report.setUser(user);
 
         return report;
 
@@ -65,7 +75,9 @@ public class ReportService {
     @Transactional
     public ReportDTO addReport(ReportDTO reportDTO) {
 
-        return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO)));
+        User user = userRepository.findUserByUsername("admin");
+        
+        return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO, user)));
 
     }
 
@@ -140,6 +152,7 @@ public class ReportService {
         report.setQuery(reportDTO.getQuery());
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
+        report.setLastUpdateTime(LocalDateTime.now());
 
         return convertReportToReportDTO(reportRepository.save(report));
 

@@ -2,7 +2,9 @@ package com.imambiplob.databasereport;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
+import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.ReportRepository;
+import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.exception.GenericJDBCException;
@@ -27,9 +29,22 @@ public class DatabaseReportServiceTests {
     @Autowired
     private ReportRepository reportRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setup() {
+
         reportRepository.deleteAll();
+        userRepository.deleteAll();
+
+        userRepository.save(User.builder()
+                .id(1L)
+                .username("admin")
+                .email("admin@gmail.com")
+                .password("admin")
+                .phone("01521559190").build());
+
     }
 
     @Test
@@ -73,14 +88,14 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Successful Retrieve of a Report")
     public void retrieveReportWithSuccess() {
         
-        Report report = Report.builder().reportName("All Employees")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportRepository.save(report);
+        ReportDTO savedReport = reportService.addReport(report);
 
-        ReportDTO retrievedReport = reportService.getReportById(report.getId());
+        ReportDTO retrievedReport = reportService.getReportById(savedReport.getId());
 
         Assertions.assertNotNull(retrievedReport, "Report should be retrieved");
         Assertions.assertEquals(report.getReportName(), retrievedReport.getReportName());
@@ -199,21 +214,19 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Successful Update of a Report")
     public void updateReportWithValidId() {
         
-        Report report = Report.builder().reportName("All Employees")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportRepository.save(report);
+        ReportDTO savedReport = reportService.addReport(report);
 
-        ReportDTO reportDTO = reportService.getReportById(report.getId());
+        savedReport.setReportName("All Junior Executives");
+        savedReport.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
 
-        reportDTO.setReportName("All Junior Executives");
-        reportDTO.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
+        ReportDTO updatedReport = reportService.updateReport(savedReport, savedReport.getId());
 
-        ReportDTO updatedReport = reportService.updateReport(reportDTO, reportDTO.getId());
-
-        Assertions.assertEquals(reportDTO.getId(), updatedReport.getId());
+        Assertions.assertEquals(savedReport.getId(), updatedReport.getId());
         Assertions.assertEquals("All Junior Executives", updatedReport.getReportName());
 
     }
@@ -222,14 +235,14 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Successful Delete of a Report")
     public void deleteReportWithValidId() {
         
-        Report report = Report.builder().reportName("All Employees")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportRepository.save(report);
+        ReportDTO savedReport = reportService.addReport(report);
 
-        ReportDTO deletedReport = reportService.deleteReport(report.getId());
+        ReportDTO deletedReport = reportService.deleteReport(savedReport.getId());
 
         Assertions.assertNull(reportRepository.findReportById(deletedReport.getId()), "Report should not exist since it's deleted");
         
