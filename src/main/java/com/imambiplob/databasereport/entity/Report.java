@@ -7,7 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -36,12 +37,15 @@ public class Report {
     @Column(name = "param_value")
     private Map<String, String> paramsMap;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "creator_user_id")
+    private User reportCreator;
 
-    private LocalDateTime creationTime = LocalDateTime.now();
+    private Date creationTime = new Date();
 
-    private LocalDateTime lastUpdateTime;
+    private Date lastUpdateTime;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
+    private List<ReportExecutionHistory> executionHistoryList;
 
 }

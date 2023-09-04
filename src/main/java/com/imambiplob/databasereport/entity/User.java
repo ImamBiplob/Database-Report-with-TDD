@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,5 +33,11 @@ public class User {
     private String password;
 
     private String phone;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
+    private List<ReportExecutionHistory> executionHistoryList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
+    private List<Report> reportList;
 
 }

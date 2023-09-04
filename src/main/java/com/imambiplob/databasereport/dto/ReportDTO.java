@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 @Data
@@ -27,10 +27,10 @@ public class ReportDTO {
 
     private Map<String, String> paramsMap;
 
-    private String username;
+    private String reportCreatorName;
 
-    private LocalDateTime creationTime;
+    private Date creationTime;
 
-    private LocalDateTime lastUpdateTime;
+    private Date lastUpdateTime;
 
 }

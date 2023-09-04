@@ -19,14 +19,14 @@ public class CsvExportService {
                 String[] columnNames = new String[columns.length];
 
                 for (int i = 0; i < columns.length; i++) {
-                    columnNames[i] = String.valueOf(columns[i]);  /** Writing column names */
+                    columnNames[i] = String.valueOf(columns[i]);  /* Writing column names */
                 }
 
                 csvWriter.writeNext(columnNames);
 
             }
 
-            /** Write the result rows */
+            /* Write the result rows */
             for (Object[] row : results) {
 
                 String[] csvRow = new String[row.length];

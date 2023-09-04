@@ -3,18 +3,20 @@ package com.imambiplob.databasereport.service;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
+import com.imambiplob.databasereport.event.ReportExecutionEvent;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,12 +25,13 @@ public class ReportService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    private final ApplicationEventPublisher publisher;
     private final ReportRepository reportRepository;
-
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
 
-    public ReportService(ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService) {
+        this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
@@ -46,7 +49,7 @@ public class ReportService {
         reportDTO.setQuery(report.getQuery());
         reportDTO.setColumns(report.getColumns());
         reportDTO.setParamsMap(report.getParamsMap());
-        reportDTO.setUsername(report.getUser().getUsername());
+        reportDTO.setReportCreatorName(report.getReportCreator().getUsername());
         reportDTO.setCreationTime(report.getCreationTime());
         reportDTO.setLastUpdateTime(report.getLastUpdateTime());
 
@@ -66,7 +69,7 @@ public class ReportService {
         report.setQuery(reportDTO.getQuery());
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
-        report.setUser(user);
+        report.setReportCreator(user);
 
         return report;
 
@@ -124,6 +127,8 @@ public class ReportService {
     @Transactional
     public List<Object[]> getResultForQuery(long id) {
 
+        User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
+
         Report report = reportRepository.findReportById(id);
 
         Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
@@ -137,6 +142,8 @@ public class ReportService {
         }
 
         List<Object[]> results = query.getResultList();
+
+        publisher.publishEvent(new ReportExecutionEvent(this, user, report));
 
         csvExportService.exportQueryResultToCsv(results, filePath, columns);
 
@@ -152,7 +159,7 @@ public class ReportService {
         report.setQuery(reportDTO.getQuery());
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
-        report.setLastUpdateTime(LocalDateTime.now());
+        report.setLastUpdateTime(new Date());
 
         return convertReportToReportDTO(reportRepository.save(report));
 

@@ -35,8 +35,8 @@ public class DatabaseReportServiceTests {
     @BeforeEach
     void setup() {
 
-        reportRepository.deleteAll();
         userRepository.deleteAll();
+        reportRepository.deleteAll();
 
         userRepository.save(User.builder()
                 .id(1L)
@@ -64,7 +64,7 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertNotNull(addedReport, "Report should be added");
         Assertions.assertEquals(reportDTO.getReportName(), addedReport.getReportName());
-        
+
     }
 
     @Test
@@ -81,13 +81,13 @@ public class DatabaseReportServiceTests {
                 .build();
 
         Assertions.assertThrows(ConstraintViolationException.class, () -> reportService.addReport(reportDTO));
-        
+
     }
-    
+
     @Test
     @DisplayName("Test for Successful Retrieve of a Report")
     public void retrieveReportWithSuccess() {
-        
+
         ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -99,9 +99,9 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertNotNull(retrievedReport, "Report should be retrieved");
         Assertions.assertEquals(report.getReportName(), retrievedReport.getReportName());
-        
+
     }
-    
+
     @Test
     @DisplayName("Test for Unsuccessful Retrieve of a Report with Non-existing ID")
     public void retrieveReportWithInvalidId() {
@@ -111,7 +111,7 @@ public class DatabaseReportServiceTests {
         Assertions.assertNull(retrievedReport, "Report of Id 100000 should not exist");
 
     }
-    
+
     @Test
     @DisplayName("Test for Successful Retrieve of Reports")
     public void retrieveReportsWithSuccess() {
@@ -121,13 +121,13 @@ public class DatabaseReportServiceTests {
         Assertions.assertNotNull(retrievedReports);
 
         /* If there is no reports, it will return empty list. That's why it's always not null. */
-        
+
     }
-    
+
     @Test
     @DisplayName("Test for Successful Run of a Report")
     public void runReportWithValidId() {
-        
+
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
@@ -142,7 +142,7 @@ public class DatabaseReportServiceTests {
         List<Object[]> results = reportService.getResultForQuery(report.getId());
 
         Assertions.assertNotNull(results);          /* If report exists and sql is valid, result will not be null */
-        
+
     }
 
     @Test
@@ -150,15 +150,15 @@ public class DatabaseReportServiceTests {
     public void runReportWithInvalidId() {
 
         /* If report doesn't exist, there will be null pointer exception */
-        
+
         Assertions.assertThrows(NullPointerException.class, () -> reportService.getResultForQuery(10000000L));
-        
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Invalid SQL")
     public void runReportOfInvalidSQL() {
-        
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employee")      /* No table named employee in database */
                 .columns("first_name,job_title,salary")
@@ -175,7 +175,7 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Malformed SQL Statement")
     public void runReportOfMalformedSQLStatement() {
-        
+
         Report report = Report.builder().reportName("All Employees")
                 .query("slect first_name, job_title, salary from employees")      /* No statement named slect in SQL */
                 .columns("first_name,job_title,salary")
@@ -192,7 +192,7 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Parameter Error")
     public void runReportOfWrongfulParameter() {
-        
+
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
@@ -213,7 +213,7 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Successful Update of a Report")
     public void updateReportWithValidId() {
-        
+
         ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -234,7 +234,7 @@ public class DatabaseReportServiceTests {
     @Test
     @DisplayName("Test for Successful Delete of a Report")
     public void deleteReportWithValidId() {
-        
+
         ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -245,13 +245,13 @@ public class DatabaseReportServiceTests {
         ReportDTO deletedReport = reportService.deleteReport(savedReport.getId());
 
         Assertions.assertNull(reportRepository.findReportById(deletedReport.getId()), "Report should not exist since it's deleted");
-        
+
     }
 
     @Test
     @DisplayName("Test for Successful Delete of All Reports")
     public void deleteAllReportsWithSuccess() {
-        
+
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employees")
                 .columns("first_name,job_title,salary")
@@ -262,7 +262,7 @@ public class DatabaseReportServiceTests {
         reportService.deleteAllReports();
 
         Assertions.assertEquals(0, reportRepository.count());
-        
+
     }
 
 }

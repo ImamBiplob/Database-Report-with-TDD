@@ -48,8 +48,8 @@ public class DatabaseReportControllerTests {
     @BeforeEach
     void setup() {
 
-        reportRepository.deleteAll();
         userRepository.deleteAll();
+        reportRepository.deleteAll();
 
         userRepository.save(User.builder()
                 .id(1L)
