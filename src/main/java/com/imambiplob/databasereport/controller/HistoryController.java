@@ -56,4 +56,11 @@ public class HistoryController {
 
     }
 
+    @GetMapping("/ofReport/{reportId}")
+    public ResponseEntity<?> getReportExecutionHistoryOfSpecificReport(@PathVariable long reportId) {
+
+        return new ResponseEntity<>(historyService.getHistoryOfReport(reportId), HttpStatus.OK);
+
+    }
+
 }

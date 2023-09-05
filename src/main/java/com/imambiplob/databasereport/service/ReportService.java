@@ -132,7 +132,7 @@ public class ReportService {
         Report report = reportRepository.findReportById(id);
 
         Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
-        String filePath = "reports/" + report.getReportName() + ".csv";
+        String filePath = "reports/" + "#ID: " + report.getId() + " - " + report.getReportName() + ".csv";
 
         String sqlQuery = report.getQuery();
         Query query = entityManager.createNativeQuery(sqlQuery);

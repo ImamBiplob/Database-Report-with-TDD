@@ -30,7 +30,8 @@ public class HistoryService {
 
         HistoryDTO historyDTO = new HistoryDTO();
         historyDTO.setId(history.getId());
-        historyDTO.setReportName(history.getReport().getReportName());
+        historyDTO.setReportId(history.getReport().getId());
+        historyDTO.setReportName(history.getReportName());
         historyDTO.setReportExecutorName(history.getReportExecutor().getUsername());
         historyDTO.setSqlQuery(history.getSqlQuery());
         historyDTO.setParamsMap(history.getParamsMap());
@@ -46,6 +47,7 @@ public class HistoryService {
         ReportExecutionHistory history = new ReportExecutionHistory();
 
         history.setReport(event.getReport());
+        history.setReportName(event.getReport().getReportName());
         history.setReportExecutor(event.getUser());
         history.setSqlQuery(event.getReport().getQuery());
 
@@ -67,7 +69,8 @@ public class HistoryService {
 
     public List<HistoryDTO> findHistoriesWithSorting(String field) {
 
-        return  historyRepository.findAll(Sort.by(Sort.Direction.ASC, field)).stream()
+        return  historyRepository.findAll(Sort.by(Sort.Direction.ASC, field))
+                .stream()
                 .map(HistoryService::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
@@ -76,7 +79,8 @@ public class HistoryService {
     public List<HistoryDTO> findHistoriesWithPagination(int offset, int pageSize) {
 
         return historyRepository.findAll(PageRequest.of(offset, pageSize))
-                .getContent().stream()
+                .getContent()
+                .stream()
                 .map(HistoryService::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
@@ -85,7 +89,8 @@ public class HistoryService {
     public List<HistoryDTO> findHistoriesWithPaginationAndSorting(int offset, int pageSize, String field) {
 
         return historyRepository.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by(field)))
-                .getContent().stream()
+                .getContent()
+                .stream()
                 .map(HistoryService::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
@@ -97,6 +102,14 @@ public class HistoryService {
             return convertHistoryToHistoryDTO(historyRepository.findById(id).get());
 
         return null;
+
+    }
+
+    public List<HistoryDTO> getHistoryOfReport(long reportId) {
+
+        return historyRepository.findReportExecutionHistoriesByReportIdIs(reportId)
+                .stream().map(HistoryService::convertHistoryToHistoryDTO)
+                .toList();
 
     }
 

@@ -80,10 +80,13 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateReport(@Valid @RequestBody ReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException {
+    public ResponseEntity<?> updateReport(@Valid @RequestBody ReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException, IllegalQueryException {
 
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        if(reportDTO.getQuery().toLowerCase().contains("drop"))
+            throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
         return new ResponseEntity<>(reportService.updateReport(reportDTO, id), HttpStatus.OK);
 
