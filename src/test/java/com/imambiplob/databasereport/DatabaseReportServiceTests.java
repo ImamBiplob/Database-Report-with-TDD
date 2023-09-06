@@ -3,6 +3,7 @@ package com.imambiplob.databasereport;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
+import com.imambiplob.databasereport.repository.HistoryRepository;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.service.ReportService;
@@ -31,6 +32,9 @@ public class DatabaseReportServiceTests {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
 
     @BeforeEach
     void setup() {
@@ -143,15 +147,20 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertNotNull(results);          /* If report exists and sql is valid, result will not be null */
 
+        /* Successful run operation results in successful history creation */
+
+        Assertions.assertEquals("All Employees Where Salary is Getter Than 100000", historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0).getReportName());
+
     }
 
     @Test
     @DisplayName("Test for Unsuccessful Run of a Report with Non-existing ID")
     public void runReportWithInvalidId() {
 
-        /* If report doesn't exist, there will be null pointer exception */
+        /* If report doesn't exist, there will be null pointer exception and no history will be created */
 
         Assertions.assertThrows(NullPointerException.class, () -> reportService.getResultForQuery(10000000L));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(10000000L).get(0));  /* No History */
 
     }
 
@@ -169,6 +178,7 @@ public class DatabaseReportServiceTests {
         /* It will throw an exception due to invalid SQL */
 
         Assertions.assertThrows(SQLGrammarException.class, () -> reportService.getResultForQuery(report.getId()));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
 
@@ -186,6 +196,7 @@ public class DatabaseReportServiceTests {
         /* It will throw an exception due to malformed SQL statement */
 
         Assertions.assertThrows(GenericJDBCException.class, () -> reportService.getResultForQuery(report.getId()));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
 
@@ -206,7 +217,9 @@ public class DatabaseReportServiceTests {
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.getResultForQuery(report.getId()));
 
-        /* Couldn't set parameter due to mismatched parameter names */
+        /* Couldn't set parameter due to mismatched parameter names, hence threw an exception */
+
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
 
