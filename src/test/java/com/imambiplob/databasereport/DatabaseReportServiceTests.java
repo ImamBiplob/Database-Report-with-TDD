@@ -43,7 +43,6 @@ public class DatabaseReportServiceTests {
         reportRepository.deleteAll();
 
         userRepository.save(User.builder()
-                .id(1L)
                 .username("admin")
                 .email("admin@gmail.com")
                 .password("admin")
@@ -59,8 +58,11 @@ public class DatabaseReportServiceTests {
         paramsMap.put("salary", "100000");
 
         ReportDTO reportDTO = ReportDTO.builder().reportName("All Employees Where Salary is Getter Than 100000")
-                .query("select first_name, job_title, salary from employees where salary > :salary")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, dept_name, salary from salaries s " +
+                        "join employees e on e.emp_no = s.emp_no " +
+                        "join dept_emp de on de.emp_no = e.emp_no " +
+                        "join departments d on d.dept_no = de.dept_no where salary > :salary")
+                .columns("first_name,department,salary")
                 .paramsMap(paramsMap)
                 .build();
 
@@ -136,8 +138,8 @@ public class DatabaseReportServiceTests {
         paramsMap.put("salary", "100000");
 
         Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
-                .query("select first_name, job_title, salary from employees where salary > :salary")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, dept_name, salary from salaries s join employees e on e.emp_no = s.emp_no join dept_emp de on de.emp_no = e.emp_no join departments d on d.dept_no = de.dept_no where salary > :salary")
+                .columns("first_name,department,salary")
                 .paramsMap(paramsMap)
                 .build();
 

@@ -56,7 +56,6 @@ public class DatabaseReportControllerTests {
         reportRepository.deleteAll();
 
         userRepository.save(User.builder()
-                .id(1L)
                 .username("admin")
                 .email("admin@gmail.com")
                 .password("admin")
@@ -72,8 +71,8 @@ public class DatabaseReportControllerTests {
         paramsMap.put("salary", "100000");
 
         ReportDTO reportDTO = ReportDTO.builder().reportName("All Employees Where Salary is Getter Than 100000")
-                .query("select first_name, job_title, salary from employees where salary > :salary")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, dept_name, salary from salaries s join employees e on e.emp_no = s.emp_no join dept_emp de on de.emp_no = e.emp_no join departments d on d.dept_no = de.dept_no where salary > :salary")
+                .columns("first_name,department,salary")
                 .paramsMap(paramsMap)
                 .build();
 
@@ -198,8 +197,8 @@ public class DatabaseReportControllerTests {
     public void runReportWithSuccess() throws Exception {
 
         ReportDTO report = ReportDTO.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, gender, hire_date from employees")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         ReportDTO savedReport = reportService.addReport(report);
@@ -325,16 +324,16 @@ public class DatabaseReportControllerTests {
     public void updateReportWithValidId() throws Exception {
 
         ReportDTO report = ReportDTO.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name from employees")
+                .columns("first_name")
                 .build();
 
         ReportDTO savedReport = reportService.addReport(report);
 
         ReportDTO updatedReport = ReportDTO.builder()
-                .reportName("All Junior Executives")
-                .query("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"")
-                .columns("first_name,job_title,salary")
+                .reportName("All Male Employees")
+                .query("select first_name, gender, hire_date from employees where gender = 'M'")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         ResultActions response = mockMvc.perform(put("/api/reports/{id}", savedReport.getId())
@@ -344,7 +343,7 @@ public class DatabaseReportControllerTests {
         response.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
-                .andExpect(jsonPath("$.reportName", is("All Junior Executives")))
+                .andExpect(jsonPath("$.reportName", is("All Male Employees")))
                 .andExpect(jsonPath("$.lastUpdateTime").isNotEmpty());
 
     }

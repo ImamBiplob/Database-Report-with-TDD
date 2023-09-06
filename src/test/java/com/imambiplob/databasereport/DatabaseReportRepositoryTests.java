@@ -28,8 +28,8 @@ public class DatabaseReportRepositoryTests {
     public void saveReportWithSuccess() {
 
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, gender, hire_date from employees")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -55,8 +55,8 @@ public class DatabaseReportRepositoryTests {
     public void findReportWithValidId() {
 
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, gender, hire_date from employees")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -82,21 +82,21 @@ public class DatabaseReportRepositoryTests {
     public void updateReportWithValidId() {
 
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, gender, hire_date from employees")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         reportRepository.save(report);
 
         Report savedReport = reportRepository.findReportById(report.getId());
 
-        savedReport.setReportName("All Junior Executives");
-        savedReport.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
+        savedReport.setReportName("All Male Employees");
+        savedReport.setQuery("select first_name, gender, hire_date from employees where gender = 'M'");
 
         Report updatedReport = reportRepository.save(savedReport);
 
         Assertions.assertEquals(savedReport.getId(), updatedReport.getId());
-        Assertions.assertEquals("All Junior Executives", updatedReport.getReportName());
+        Assertions.assertEquals("All Male Employees", updatedReport.getReportName());
 
     }
 
@@ -105,8 +105,8 @@ public class DatabaseReportRepositoryTests {
     public void deleteReportWithValidId() {
 
         Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
+                .query("select first_name, gender, hire_date from employees")
+                .columns("first_name,gender,hire_date")
                 .build();
 
         reportRepository.save(report);
