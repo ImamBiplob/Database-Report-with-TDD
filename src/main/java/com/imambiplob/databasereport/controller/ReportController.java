@@ -75,7 +75,7 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        return new ResponseEntity<>(reportService.getResultForQuery(id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.runReport(id), HttpStatus.OK);
 
     }
 

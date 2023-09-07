@@ -31,7 +31,7 @@ public class Report {
     private String columns;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "paramName_paramValue_mapping",
+    @CollectionTable(name = "report_paramsMapping",
             joinColumns = {@JoinColumn(name = "report_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "param_name")
     @Column(name = "param_value")

@@ -3,6 +3,7 @@ package com.imambiplob.databasereport.service;
 import com.opencsv.CSVWriter;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +13,10 @@ public class CsvExportService {
 
     public void exportQueryResultToCsv(List<Object[]> results, String filePath, Object[] columns) {
 
-        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(filePath))) {
+        try {
+
+            FileWriter resultFile = new FileWriter(filePath);
+            CSVWriter csvWriter = new CSVWriter(resultFile);
 
             if (columns != null) {
 

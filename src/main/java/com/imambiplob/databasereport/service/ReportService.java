@@ -1,11 +1,14 @@
 package com.imambiplob.databasereport.service;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
+import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
-import com.imambiplob.databasereport.event.ReportExecutionEvent;
+import com.imambiplob.databasereport.event.ReportExecutionEventForFile;
+import com.imambiplob.databasereport.event.ReportExecutionEventForHistory;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
+import com.imambiplob.databasereport.util.MultipartFileImplementation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -13,8 +16,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -125,25 +132,57 @@ public class ReportService {
     }
 
     @Transactional
-    public List<Object[]> getResultForQuery(long id) {
+    public List<Object[]> runReport(long id) {
 
         User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
 
         Report report = reportRepository.findReportById(id);
 
-        Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
         String filePath = "reports/" + "#ID: " + report.getId() + " - " + report.getReportName() + ".csv";
 
-        String sqlQuery = report.getQuery();
-        Query query = entityManager.createNativeQuery(sqlQuery);
+        File file = new File(filePath);
+
+        MultipartFile multipartFile = new MultipartFileImplementation(file);
+
+        List<Object[]> results = getResults(report, filePath);
+
+        publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
+
+        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
+
+        return results;
+
+    }
+
+    @Scheduled(cron = "${interval-in-cron}")
+    @Transactional
+    public void runReport() throws InterruptedException, IOException {
+
+        Report report = reportRepository.findReportById(555);
+
+        String filePath = "reportsDB/" + "#ID: " + report.getId() + " - " + report.getReportName() + ".csv";
+
+        File file = new File(filePath);
+
+        MultipartFile multipartFile = new MultipartFileImplementation(file);
+
+        getResults(report, filePath);
+
+        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
+
+    }
+
+    public List<Object[]> getResults(Report report, String filePath) {
+
+        Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
+
+        Query query = entityManager.createNativeQuery(report.getQuery());
 
         for (String paramName : report.getParamsMap().keySet()) {
             query.setParameter(paramName, report.getParamsMap().get(paramName));
         }
 
         List<Object[]> results = query.getResultList();
-
-        publisher.publishEvent(new ReportExecutionEvent(this, user, report));
 
         csvExportService.exportQueryResultToCsv(results, filePath, columns);
 
@@ -175,14 +214,14 @@ public class ReportService {
 
     }
 
-    public String deleteAllReports() {
+    public ResponseMessage deleteAllReports() {
 
         if(reportRepository.count() > 0) {
             reportRepository.deleteAll();
-            return "All Reports Have Been DELETED!!!";
+            return new ResponseMessage("All Reports Have Been DELETED!!!");
         }
 
-        return "It's Already Empty!!!";
+        return new ResponseMessage("It's Already Empty!!!");
 
     }
 

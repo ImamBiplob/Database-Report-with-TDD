@@ -6,13 +6,13 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class ReportExecutionEvent extends ApplicationEvent {
-
-    private final User user;
+public class ReportExecutionEventForHistory extends ApplicationEvent {
 
     private final Report report;
 
-    public ReportExecutionEvent(Object source, User user, Report report) {
+    private final User user;
+
+    public ReportExecutionEventForHistory(Object source, User user, Report report) {
 
         super(source);
         this.user = user;

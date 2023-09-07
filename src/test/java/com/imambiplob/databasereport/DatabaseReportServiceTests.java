@@ -145,7 +145,7 @@ public class DatabaseReportServiceTests {
 
         reportRepository.save(report);
 
-        List<Object[]> results = reportService.getResultForQuery(report.getId());
+        List<Object[]> results = reportService.runReport(report.getId());
 
         Assertions.assertNotNull(results);          /* If report exists and sql is valid, result will not be null */
 
@@ -161,7 +161,7 @@ public class DatabaseReportServiceTests {
 
         /* If report doesn't exist, there will be null pointer exception and no history will be created */
 
-        Assertions.assertThrows(NullPointerException.class, () -> reportService.getResultForQuery(10000000L));
+        Assertions.assertThrows(NullPointerException.class, () -> reportService.runReport(10000000L));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(10000000L).get(0));  /* No History */
 
     }
@@ -179,7 +179,7 @@ public class DatabaseReportServiceTests {
 
         /* It will throw an exception due to invalid SQL */
 
-        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.getResultForQuery(report.getId()));
+        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.runReport(report.getId()));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
@@ -197,7 +197,7 @@ public class DatabaseReportServiceTests {
 
         /* It will throw an exception due to malformed SQL statement */
 
-        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.getResultForQuery(report.getId()));
+        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.runReport(report.getId()));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
@@ -217,7 +217,7 @@ public class DatabaseReportServiceTests {
 
         reportRepository.save(report);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.getResultForQuery(report.getId()));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.runReport(report.getId()));
 
         /* Couldn't set parameter due to mismatched parameter names, hence threw an exception */
 

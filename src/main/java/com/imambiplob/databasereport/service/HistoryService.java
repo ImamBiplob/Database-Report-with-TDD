@@ -2,7 +2,7 @@ package com.imambiplob.databasereport.service;
 
 import com.imambiplob.databasereport.dto.HistoryDTO;
 import com.imambiplob.databasereport.entity.ReportExecutionHistory;
-import com.imambiplob.databasereport.event.ReportExecutionEvent;
+import com.imambiplob.databasereport.event.ReportExecutionEventForHistory;
 import com.imambiplob.databasereport.repository.HistoryRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ public class HistoryService {
     }
 
     @EventListener
-    void handleReportExecution(ReportExecutionEvent event) {
+    void handleReportExecution(ReportExecutionEventForHistory event) {
 
         ReportExecutionHistory history = new ReportExecutionHistory();
 
