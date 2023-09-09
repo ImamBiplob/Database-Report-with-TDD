@@ -1,6 +1,7 @@
 package com.imambiplob.databasereport.controller;
 
 import com.imambiplob.databasereport.dto.HistoryDTO;
+import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.service.HistoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +53,12 @@ public class HistoryController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getReportExecutionHistoryWithId(@PathVariable long id) {
 
-        return new ResponseEntity<>(historyService.getHistory(id), HttpStatus.OK);
+        HistoryDTO historyDTO = historyService.getHistory(id);
+
+        if(historyDTO != null)
+            return new ResponseEntity<>(historyDTO, HttpStatus.OK);
+
+        return new ResponseEntity<>(new ResponseMessage("No Execution History Found!!!"), HttpStatus.NOT_FOUND);
 
     }
 

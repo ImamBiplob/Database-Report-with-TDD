@@ -59,6 +59,7 @@ public class ReportService {
         reportDTO.setReportCreatorName(report.getReportCreator().getUsername());
         reportDTO.setCreationTime(report.getCreationTime());
         reportDTO.setLastUpdateTime(report.getLastUpdateTime());
+        reportDTO.setDownloadLink(report.getDownloadLink());
 
         return reportDTO;
 
@@ -131,65 +132,6 @@ public class ReportService {
 
     }
 
-    @Transactional
-    public List<Object[]> runReport(long id) {
-
-        User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
-
-        Report report = reportRepository.findReportById(id);
-
-        String filePath = "reports/" + "#ID: " + report.getId() + " - " + report.getReportName() + ".csv";
-
-        File file = new File(filePath);
-
-        MultipartFile multipartFile = new MultipartFileImplementation(file);
-
-        List<Object[]> results = getResults(report, filePath);
-
-        publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
-
-        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
-
-        return results;
-
-    }
-
-    @Scheduled(cron = "${interval-in-cron}")
-    @Transactional
-    public void runReport() throws InterruptedException, IOException {
-
-        Report report = reportRepository.findReportById(555);
-
-        String filePath = "reportsDB/" + "#ID: " + report.getId() + " - " + report.getReportName() + ".csv";
-
-        File file = new File(filePath);
-
-        MultipartFile multipartFile = new MultipartFileImplementation(file);
-
-        getResults(report, filePath);
-
-        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
-
-    }
-
-    public List<Object[]> getResults(Report report, String filePath) {
-
-        Object[] columns = Arrays.stream(report.getColumns().split(",")).toArray();
-
-        Query query = entityManager.createNativeQuery(report.getQuery());
-
-        for (String paramName : report.getParamsMap().keySet()) {
-            query.setParameter(paramName, report.getParamsMap().get(paramName));
-        }
-
-        List<Object[]> results = query.getResultList();
-
-        csvExportService.exportQueryResultToCsv(results, filePath, columns);
-
-        return results;
-
-    }
-
     public ReportDTO updateReport(ReportDTO reportDTO, long id) {
 
         Report report = reportRepository.findReportById(id);
@@ -222,6 +164,66 @@ public class ReportService {
         }
 
         return new ResponseMessage("It's Already Empty!!!");
+
+    }
+
+    @Transactional
+    public List<Object[]> runReport(long id) {
+
+        User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
+
+        Report report = reportRepository.findReportById(id);
+
+        String filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+
+        List<Object[]> results = performExecution(report, filePath);
+
+        publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
+
+        return results;
+
+    }
+
+    @Scheduled(cron = "${interval-in-cron}")
+    @Transactional
+    public void runReport() throws InterruptedException, IOException {
+
+        Report report = reportRepository.findReportById(555);
+
+        String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+
+        performExecution(report, filePath);
+
+    }
+
+    public List<Object[]> performExecution(Report report, String filePath) {
+
+        Object[] columns = null;
+
+        if(report.getColumns() != null)
+            columns = Arrays.stream(report.getColumns().split(",")).toArray();
+
+        List<Object[]> results = getResults(report);
+
+        File file = csvExportService.exportQueryResultToCsv(results, filePath, columns);
+
+        MultipartFile multipartFile = new MultipartFileImplementation(file);
+
+        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
+
+        return results;
+
+    }
+
+    public List<Object[]> getResults(Report report) {
+
+        Query query = entityManager.createNativeQuery(report.getQuery());
+
+        for (String paramName : report.getParamsMap().keySet()) {
+            query.setParameter(paramName, report.getParamsMap().get(paramName));
+        }
+
+        return (List<Object[]>) query.getResultList();
 
     }
 

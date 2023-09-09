@@ -11,12 +11,14 @@ import java.util.List;
 @Service
 public class CsvExportService {
 
-    public void exportQueryResultToCsv(List<Object[]> results, String filePath, Object[] columns) {
+    public File exportQueryResultToCsv(List<Object[]> results, String filePath, Object[] columns) {
+
+        File file = new File(filePath);
 
         try {
 
-            FileWriter resultFile = new FileWriter(filePath);
-            CSVWriter csvWriter = new CSVWriter(resultFile);
+            FileWriter fileWriter = new FileWriter(filePath);
+            CSVWriter csvWriter = new CSVWriter(fileWriter);
 
             if (columns != null) {
 
@@ -43,11 +45,15 @@ public class CsvExportService {
 
             }
 
+            fileWriter.flush();
+
         } catch (IOException e) {
 
             e.printStackTrace();
 
         }
+
+        return file;
 
     }
 

@@ -14,10 +14,10 @@ import java.util.Date;
 public class ReportFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "report_id")
     private Report report;
 
@@ -25,6 +25,7 @@ public class ReportFile {
 
     private String fileType;
 
+    @Column(columnDefinition = "LONGBLOB")
     @Lob
     private byte[] data;
 

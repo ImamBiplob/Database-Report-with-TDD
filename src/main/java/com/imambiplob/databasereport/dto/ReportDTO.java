@@ -34,4 +34,6 @@ public class ReportDTO implements Serializable {
 
     private Date lastUpdateTime;
 
+    private String downloadLink;
+
 }

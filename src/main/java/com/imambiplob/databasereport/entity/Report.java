@@ -45,7 +45,9 @@ public class Report {
 
     private Date lastUpdateTime;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
+    @OneToMany(mappedBy = "report")
     private List<ReportExecutionHistory> executionHistoryList;
+
+    private String downloadLink;
 
 }
