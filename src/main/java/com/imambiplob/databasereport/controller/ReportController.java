@@ -7,11 +7,14 @@ import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
-@RestController
+@Controller
+//@RestController
 @RequestMapping("api/reports")
 public class ReportController {
 
@@ -19,6 +22,48 @@ public class ReportController {
 
     public ReportController(ReportService reportService) {
         this.reportService = reportService;
+    }
+
+    @PostMapping("/saveReport")
+    public String saveReport(@ModelAttribute ReportDTO reportDTO) {
+
+        reportService.addReport(reportDTO);
+
+        return "redirect:/api/reports/view";
+
+    }
+
+    @GetMapping("/view")
+    public ModelAndView getReportsView() {
+
+        List<ReportDTO> reports = reportService.getReports();
+        ModelAndView mav = new ModelAndView("list-reports");
+        mav.addObject("reports", reports);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/addReportForm")
+    public ModelAndView addReportForm() {
+
+        ModelAndView mav = new ModelAndView("add-report-form");
+        ReportDTO newReport = new ReportDTO();
+        mav.addObject("report", newReport);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/editReportForm")
+    public ModelAndView editReportForm(@RequestParam long reportId) {
+
+        ModelAndView mav = new ModelAndView("add-report-form");
+        ReportDTO report = reportService.getReportById(reportId);
+        mav.addObject("report", report);
+
+        return mav;
+
     }
 
     @PostMapping
