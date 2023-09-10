@@ -5,6 +5,7 @@ import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.HistoryRepository;
+import com.imambiplob.databasereport.repository.ReportFileRepository;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.service.ReportService;
@@ -49,11 +50,16 @@ public class DatabaseReportControllerTests {
     @Autowired
     private HistoryRepository historyRepository;
 
+    @Autowired
+    private ReportFileRepository reportFileRepository;
+
     @BeforeEach
     void setup() {
 
-        userRepository.deleteAll();
+        historyRepository.deleteAll();
+        reportFileRepository.deleteAll();
         reportRepository.deleteAll();
+        userRepository.deleteAll();
 
         userRepository.save(User.builder()
                 .username("admin")
