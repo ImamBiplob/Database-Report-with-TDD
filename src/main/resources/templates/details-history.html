@@ -1,0 +1,65 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Details of History</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous" />
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <h3 class="">Details of History</h3>
+
+    <table class="table table-bordered table-striped my-5">
+
+        <tbody>
+
+            <div th:object="${history}">
+
+                <tr>
+                    <th>History ID</th>
+                    <td th:text="${history.id}" />
+                </tr>
+                <tr>
+                    <th>Report ID</th>
+                    <td th:text="${history.reportId}" />
+                </tr>
+                <tr>
+                    <th>Report Name</th>
+                    <td th:text="${history.reportName}" />
+                </tr>
+                <tr>
+                    <th>Report Execution Time</th>
+                    <td th:text="${history.executionTime}" />
+                </tr>
+                <tr>
+                    <th>Report Executor Name</th>
+                    <td th:text="${history.reportExecutorName}" />
+                </tr>
+                <tr>
+                    <th>SQL Query</th>
+                    <td th:text="${history.sqlQuery}" />
+                </tr>
+                <tr>
+                    <th>Param Name and Value</th>
+                    <td th:text="${history.paramsMap}" />
+                </tr>
+
+            </div>
+
+        </tbody>
+
+    </table>
+
+    <hr/>
+    <a th:href="@{/api/histories/view(reportId=${history.reportId})}">Back to History List</a>
+</div>
+
+</body>
+
+</html>

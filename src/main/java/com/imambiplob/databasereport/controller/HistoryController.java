@@ -1,14 +1,13 @@
 package com.imambiplob.databasereport.controller;
 
 import com.imambiplob.databasereport.dto.HistoryDTO;
+import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.service.HistoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -66,6 +65,28 @@ public class HistoryController {
     public ResponseEntity<?> getReportExecutionHistoryOfSpecificReport(@PathVariable long reportId) {
 
         return new ResponseEntity<>(historyService.getHistoryOfReport(reportId), HttpStatus.OK);
+
+    }
+
+    @GetMapping("/view")
+    public ModelAndView getHistoryView(@RequestParam long reportId) {
+
+        List<HistoryDTO> history = historyService.getHistoryOfReport(reportId);
+        ModelAndView mav = new ModelAndView("list-history");
+        mav.addObject("history", history);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/details")
+    public ModelAndView getHistoryDetails(@RequestParam long id) {
+
+        HistoryDTO history = historyService.getHistory(id);
+        ModelAndView mav = new ModelAndView("details-history");
+        mav.addObject("history", history);
+
+        return mav;
 
     }
 

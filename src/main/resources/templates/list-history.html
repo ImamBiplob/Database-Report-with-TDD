@@ -1,7 +1,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>List of Report</title>
+    <title>Execution History of Report</title>
 
     <link rel="stylesheet"
           type="text/css"
@@ -16,42 +16,36 @@
 
 <div class="container-100 m-5 px-5">
 
-    <h3 class="">List of Report</h3>
-
-    <hr/>
-    <a th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary">Add New Report</a>
-    <br/><br/>
+    <h3 class="">Execution History of Report</h3>
 
     <table class="table table-bordered table-striped" id="reportTable">
 
         <thead>
         <tr>
+            <th>History ID</th>
             <th>Report ID</th>
             <th>Report Name</th>
-            <th>Report Creation Time</th>
-            <th>Last Update Time</th>
-            <th>Report Creator Name</th>
-            <th>Actions</th>
+            <th>Report Execution Time</th>
+            <th>Report Executor Name</th>
+            <th>Action</th>
         </tr>
         </thead>
 
         <tbody>
-        <tr th:each="report: ${reports}">
-            <td th:text="${report.id}" />
-            <td th:text="${report.reportName}" />
-            <td th:text="${report.creationTime}" />
-            <td th:text="${report.lastUpdateTime}" />
-            <td th:text="${report.reportCreatorName}" />
-            <td>
-                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info">Edit</a>
-                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info">Execution History</a>
-                <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info">Run</a>
-                <a th:href="@{${report.downloadLink}}" class="btn btn-info">Download</a>
-            </td>
+        <tr th:each="h: ${history}">
+            <td th:text="${h.id}" />
+            <td th:text="${h.reportId}" />
+            <td th:text="${h.reportName}" />
+            <td th:text="${h.executionTime}" />
+            <td th:text="${h.reportExecutorName}" />
+            <td> <a th:href="@{/api/histories/view/details(id=${h.id})}" class="btn btn-info">History Details</a> </td>
         </tr>
         </tbody>
 
     </table>
+
+    <hr/>
+    <a th:href="@{/api/reports/view}">Back to Report List</a>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

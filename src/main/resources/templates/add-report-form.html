@@ -25,16 +25,27 @@
 
 					<input type="text" th:field="*{columns}" class="form-control w-100 mb-4" placeholder="Enter Column Names Separated by Comma(,)" />
 
-					<div id="paramsContainer">
-						<h3>Parameters</h3>
-						<div th:each="param, iterStat : *{paramsMap.keySet()}">
-							<input type="text" th:field="*{paramsMap[__${iterStat.index}__]}" placeholder="Key=Value">
-							<button type="button" class="removeButton" onclick="removeParam(this)">-</button>
-						</div>
-					</div>
+					<table>
+						<tr th:each="entry, rowStat : ${report.paramsMap.entrySet()}">
+							<td><input type="text" th:field="${report.paramsMap[__${rowStat.index}__].key}" /></td>
+							<td><input type="text" th:field="${report.paramsMap[__${rowStat.index}__].value}" /></td>
+						</tr>
+					</table>
 
-					<button type="button" id="addParamButton">+</button>
-
+<!--					<table class="table table-bordered table-striped">-->
+<!--						<thead>-->
+<!--						<tr>-->
+<!--							<th>Param Name</th>-->
+<!--							<th>Param Value</th>-->
+<!--						</tr>-->
+<!--						</thead>-->
+<!--						<tbody>-->
+<!--						<tr th:each="parameter: ${report.paramsMap}">-->
+<!--							<td th:text="${parameter.key}" />-->
+<!--							<td th:text="${parameter.value}" />-->
+<!--						</tr>-->
+<!--						</tbody>-->
+<!--					</table>-->
 
 					<button type="submit" class="btn btn-primary col-2">Save</button>
 					<input type="hidden" th:field="*{id}" />
@@ -48,12 +59,32 @@
 
 		</div>
 
-		<script th:inline="javascript">
-			var index = 0;
-		</script>
-		<script th:src="@{file.js}"></script>
+<!--		<script th:inline="javascript">-->
+<!--			function addParameter() {-->
+<!--				var newKey = prompt("Enter parameter key:");-->
+<!--				if (newKey != null) {-->
+<!--					var container = document.querySelector("div[th\\:each*='${report.paramsMap}']");-->
+<!--					var newDiv = document.createElement("div");-->
+<!--					newDiv.innerHTML = `-->
+<!--                    <input type="text" th:field="*{paramsMap[__${newKey}__]}" placeholder="Key" />-->
+<!--                    <input type="text" th:field="*{paramsMap[__${newKey}__]}" placeholder="Value" />-->
+<!--                    <button type="button" th:onclick="'removeParameter(\'' + '${newKey}' + '\')'">Remove</button>-->
+<!--                `;-->
+<!--					container.appendChild(newDiv);-->
+<!--				}-->
+<!--			}-->
 
-
+<!--			function removeParameter(key) {-->
+<!--				var container = document.querySelector("div[th\\:each*='${report.paramsMap}']");-->
+<!--				var elements = container.querySelectorAll("div");-->
+<!--				elements.forEach(function(element) {-->
+<!--					var input = element.querySelector("input[type='text']");-->
+<!--					if (input && input.value === key) {-->
+<!--						container.removeChild(element);-->
+<!--					}-->
+<!--				});-->
+<!--			}-->
+<!--		</script>-->
 
 	</body>
 </html>
