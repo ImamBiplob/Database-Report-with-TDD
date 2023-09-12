@@ -17,6 +17,7 @@
 <div class="container-100 m-5 px-5">
 
     <h3 class="">Execution History of Report</h3>
+    <hr/>
 
     <table class="table table-bordered table-striped" id="reportTable">
 
@@ -38,7 +39,7 @@
             <td th:text="${h.reportName}" />
             <td th:text="${h.executionTime}" />
             <td th:text="${h.reportExecutorName}" />
-            <td> <a th:href="@{/api/histories/view/details(id=${h.id})}" class="btn btn-info">History Details</a> </td>
+            <td> <a th:href="@{/api/histories/view/details(id=${h.id})}" class="btn btn-info m-1">History Details</a> </td>
         </tr>
         </tbody>
 

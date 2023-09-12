@@ -43,16 +43,16 @@
             <td th:text="${report.lastUpdateTime}" />
             <td th:text="${report.reportCreatorName}" />
             <td>
-                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info">Edit</a>
-                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info">Execution History</a>
-                <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info">Run</a>
-                <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info">Download</a>
-
+                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 mr-1">Edit</a>
+                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 mr-1">Execution History</a>
+                <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info my-1 mr-1">Run</a>
+                <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info my-1 mr-1">Download</a>
             </td>
         </tr>
         </tbody>
 
     </table>
+
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

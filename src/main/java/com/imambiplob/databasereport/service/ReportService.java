@@ -78,6 +78,7 @@ public class ReportService {
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
         report.setReportCreator(user);
+        report.getParamsMap().remove("","");
 
         return report;
 
@@ -141,6 +142,7 @@ public class ReportService {
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
         report.setLastUpdateTime(new Date());
+        report.getParamsMap().remove("","");
 
         return convertReportToReportDTO(reportRepository.save(report));
 
@@ -201,7 +203,7 @@ public class ReportService {
         Object[] columns = null;
 
         if(report.getColumns() != null)
-            columns = Arrays.stream(report.getColumns().split(",")).toArray();
+            columns = Arrays.stream(report.getColumns().trim().split(",")).toArray();
 
         List<Object[]> results = getResults(report);
 

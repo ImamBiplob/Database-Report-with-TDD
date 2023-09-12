@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 //@RestController
@@ -64,12 +66,18 @@ public class ReportController {
         reportDTO.setCreationTime(reportView.getCreationTime());
         reportDTO.setLastUpdateTime(reportView.getLastUpdateTime());
         reportDTO.setDownloadLink(reportView.getDownloadLink());
+        Map<String, String> paramsMap = new HashMap<>();
 
         if(reportView.getParamsList() != null) {
-            for (ParamDTO paramDTO : reportView.getParamsList()) {
-                reportDTO.getParamsMap().put(paramDTO.getParamName(), paramDTO.getParamValue());
+            if(!reportView.getParamsList().isEmpty()) {
+                for (ParamDTO paramDTO : reportView.getParamsList()) {
+                    paramsMap.put(paramDTO.getParamName(), paramDTO.getParamValue());
+                }
             }
         }
+
+        reportDTO.setParamsMap(paramsMap);
+        reportDTO.getParamsMap().remove("","");
 
         return reportDTO;
 

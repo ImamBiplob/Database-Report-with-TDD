@@ -36,15 +36,15 @@
 						</div>
 
 						<!-- ParamDTO List -->
-						<div id="paramsList" class="mb-4" th:each="paramItem, paramStat : *{paramsList}">
+						<div id="paramsList" class="mb-2" th:each="paramItem, paramStat : *{paramsList}">
 
 							<div class="param" th:id="'param_' + ${paramStat.index}">
 
 								<label th:for="'paramDTO[' + ${paramStat.index} + '].paramName'">Parameter Name:</label>
-								<input type="text" th:field="*{paramsList[__${paramStat.index}__].paramName}" required="required">
+								<input type="text" th:field="*{paramsList[__${paramStat.index}__].paramName}">
 
 								<label th:for="'paramDTO[' + ${paramStat.index} + '].paramValue'">Parameter Value:</label>
-								<input type="text" th:field="*{paramsList[__${paramStat.index}__].paramValue}" required="required">
+								<input type="text" th:field="*{paramsList[__${paramStat.index}__].paramValue}">
 
 								<button type="button" class="remove-param-button btn btn-danger btn-sm m-1" th:attr="data-index=${paramStat.index}">Remove</button>
 
@@ -53,7 +53,7 @@
 						</div>
 
 						<div class="w-50">
-							<button type="button" id="add-param-button" class="btn btn-secondary btn-sm" style="width: 120px; height: 35px;">Add Parameter</button>
+							<button type="button" id="add-param-button" class="btn btn-secondary btn-sm my-1" style="width: 120px; height: 35px;">Add Parameter</button>
 						</div>
 
 					</div>
@@ -118,10 +118,10 @@
 					newParam.classList.add("param");
 					newParam.innerHTML = `
                 <label for="paramDTO[${paramIndex}].paramName">Parameter Name:</label>
-                <input type="text" id="paramDTO[${paramIndex}].paramName" name="paramDTO[${paramIndex}].paramName" required="required">
+                <input type="text" id="paramDTO[${paramIndex}].paramName" name="paramDTO[${paramIndex}].paramName">
 
                 <label for="paramDTO[${paramIndex}].paramValue">Parameter Value:</label>
-                <input type="text" id="paramDTO[${paramIndex}].paramValue" name="paramDTO[${paramIndex}].paramValue" required="required">
+                <input type="text" id="paramDTO[${paramIndex}].paramValue" name="paramDTO[${paramIndex}].paramValue">
 
                 <button type="button" class="remove-param-button btn btn-danger btn-sm m-1">Remove</button>
             `;
