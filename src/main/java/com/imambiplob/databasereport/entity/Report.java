@@ -28,6 +28,7 @@ public class Report {
     @NotBlank(message = "Query must not be blank")
     private String query;
 
+    @NotBlank(message = "Columns must not be blank")
     private String columns;
 
     @ElementCollection(fetch = FetchType.EAGER)

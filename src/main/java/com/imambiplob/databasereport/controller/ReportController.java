@@ -1,6 +1,8 @@
 package com.imambiplob.databasereport.controller;
 
+import com.imambiplob.databasereport.dto.ParamDTO;
 import com.imambiplob.databasereport.dto.ReportDTO;
+import com.imambiplob.databasereport.dto.ReportView;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.service.ReportService;
@@ -11,12 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
-@RestController
+//@RestController
 @RequestMapping("api/reports")
 public class ReportController {
 
@@ -26,10 +27,69 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @PostMapping("/saveReport")
-    public String saveReport(@ModelAttribute ReportDTO reportDTO) {
+    public static ReportView convertReportDTOToReportView(ReportDTO reportDTO) {
 
+        ReportView reportView = new ReportView();
+        reportView.setId(reportDTO.getId());
+        reportView.setReportName(reportDTO.getReportName());
+        reportView.setColumns(reportDTO.getColumns());
+        reportView.setQuery(reportDTO.getQuery());
+        reportView.setReportCreatorName(reportDTO.getReportCreatorName());
+        reportView.setCreationTime(reportDTO.getCreationTime());
+        reportView.setLastUpdateTime(reportDTO.getLastUpdateTime());
+        reportView.setDownloadLink(reportDTO.getDownloadLink());
+        List<ParamDTO> paramsList = new ArrayList<>();
+
+        for(String paramName : reportDTO.getParamsMap().keySet()) {
+            ParamDTO param = new ParamDTO();
+            param.setParamName(paramName);
+            param.setParamValue(reportDTO.getParamsMap().get(paramName));
+            paramsList.add(param);
+        }
+
+        reportView.setParamsList(paramsList);
+
+        return reportView;
+
+    }
+
+    public static ReportDTO convertReportViewToReportDTO(ReportView reportView) {
+
+        ReportDTO reportDTO = new ReportDTO();
+        reportDTO.setId(reportView.getId());
+        reportDTO.setReportName(reportView.getReportName());
+        reportDTO.setQuery(reportView.getQuery());
+        reportDTO.setColumns(reportView.getColumns());
+        reportDTO.setReportCreatorName(reportView.getReportCreatorName());
+        reportDTO.setCreationTime(reportView.getCreationTime());
+        reportDTO.setLastUpdateTime(reportView.getLastUpdateTime());
+        reportDTO.setDownloadLink(reportView.getDownloadLink());
+
+        if(reportView.getParamsList() != null) {
+            for (ParamDTO paramDTO : reportView.getParamsList()) {
+                reportDTO.getParamsMap().put(paramDTO.getParamName(), paramDTO.getParamValue());
+            }
+        }
+
+        return reportDTO;
+
+    }
+
+    @PostMapping("/saveReport")
+    public String saveReport(@ModelAttribute ReportView reportView) {
+
+        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
         reportService.addReport(reportDTO);
+
+        return "redirect:/api/reports/view";
+
+    }
+
+    @PostMapping("/updateReport")
+    public String updateReport(@ModelAttribute ReportView reportView) {
+
+        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+        reportService.updateReport(reportDTO, reportDTO.getId());
 
         return "redirect:/api/reports/view";
 
@@ -50,9 +110,8 @@ public class ReportController {
     public ModelAndView addReportForm() {
 
         ModelAndView mav = new ModelAndView("add-report-form");
-        ReportDTO newReport = new ReportDTO();
-        Map<String, String> map = new HashMap<>();
-        newReport.setParamsMap(map);
+        ReportView newReport = new ReportView();
+        newReport.setParamsList(List.of(new ParamDTO()));
         mav.addObject("report", newReport);
 
         return mav;
@@ -60,10 +119,15 @@ public class ReportController {
     }
 
     @GetMapping("/view/editReportForm")
-    public ModelAndView editReportForm(@RequestParam long reportId) {
+    public ModelAndView editReportForm(@RequestParam long reportId) throws ReportNotFoundException {
 
-        ModelAndView mav = new ModelAndView("add-report-form");
-        ReportDTO report = reportService.getReportById(reportId);
+        if(reportService.getReportById(reportId) == null)
+            throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");
+
+        ModelAndView mav = new ModelAndView("edit-report-form");
+        ReportView report = convertReportDTOToReportView(reportService.getReportById(reportId));
+        if(report.getParamsList().isEmpty())
+            report.setParamsList(List.of(new ParamDTO()));
         mav.addObject("report", report);
 
         return mav;

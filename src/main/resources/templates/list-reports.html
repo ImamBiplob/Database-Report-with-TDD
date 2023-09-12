@@ -46,7 +46,8 @@
                 <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info">Edit</a>
                 <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info">Execution History</a>
                 <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info">Run</a>
-                <a th:href="@{${report.downloadLink}}" class="btn btn-info">Download</a>
+                <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info">Download</a>
+
             </td>
         </tr>
         </tbody>

@@ -2,19 +2,17 @@ package com.imambiplob.databasereport.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ReportDTO implements Serializable {
+public class ReportView implements Serializable {
 
     private long id;
 
@@ -27,7 +25,7 @@ public class ReportDTO implements Serializable {
     @NotBlank(message = "Columns must not be blank")
     private String columns;
 
-    private Map<String, String> paramsMap;
+    private List<ParamDTO> paramsList;
 
     private String reportCreatorName;
 
