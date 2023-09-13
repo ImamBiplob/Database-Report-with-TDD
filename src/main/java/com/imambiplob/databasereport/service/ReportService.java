@@ -1,5 +1,6 @@
 package com.imambiplob.databasereport.service;
 
+import com.imambiplob.databasereport.dto.EmailDetails;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.entity.Report;
@@ -36,12 +37,14 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
+    private final EmailService emailService;
 
-    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService) {
         this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
+        this.emailService = emailService;
     }
 
     public static ReportDTO convertReportToReportDTO(Report report) {
@@ -182,6 +185,13 @@ public class ReportService {
 
         publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
 
+//        EmailDetails emailDetails = new EmailDetails();
+//        emailDetails.setAttachment(filePath);
+//        emailDetails.setSubject("Report of " + report.getReportName());
+//        emailDetails.setRecipient("imamhbiplob@gmail.com");
+//        emailDetails.setMsgBody("Hello,\n\nReport file of last execution is attached with the mail.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
+//        emailService.sendMailWithAttachment(emailDetails);
+
         return results;
 
     }
@@ -195,6 +205,13 @@ public class ReportService {
         String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
 
         performExecution(report, filePath);
+
+        EmailDetails emailDetails = new EmailDetails();
+        emailDetails.setAttachment(filePath);
+        emailDetails.setSubject("Report of " + report.getReportName());
+        emailDetails.setRecipient("imamhbiplob@gmail.com");
+        emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
+        emailService.sendMailWithAttachment(emailDetails);
 
     }
 
