@@ -1,38 +1,45 @@
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <title>Edit Report</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
-          crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+
 </head>
+
 <body>
 
-<div class="container mt-5">
+<div class="container mt-5" th:object="${report}">
 
     <h3>Edit Report</h3>
     <hr/>
 
     <div class="my-2 w-100">
 
-        <form id="ReportForm" class="w-100" th:action="@{/api/reports/updateReport}" th:object="${report}" method="POST">
+        <form id="ReportForm" class="w-100" th:action="@{/api/reports/updateReport}" method="POST">
 
             <div class="w-100 d-flex flex-column">
                 <div>
                     <label for="reportName">Report Name:</label>
-                    <input class="form-control w-100 mb-4" type="text" id="reportName" th:field="*{reportName}" placeholder="Enter Report Name" required="required">
+                    <input class="form-control w-100 mb-4" type="text" id="reportName" th:field="*{reportName}"
+                           placeholder="Enter Report Name" required="required">
                     <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
                 </div>
                 <div>
                     <label for="query">SQL Query:</label>
-                    <textarea class="form-control w-100 mb-4" id="query" th:field="*{query}" placeholder="Enter SQL Query" required="required"></textarea>
+                    <textarea class="form-control w-100 mb-4" id="query" th:field="*{query}"
+                              placeholder="Enter SQL Query" required="required"></textarea>
                     <span th:if="${#fields.hasErrors('query')}" th:errors="*{query}"></span>
                 </div>
                 <div>
                     <label for="columns">Columns:</label>
-                    <input class="form-control w-100 mb-4" type="text" id="columns" th:field="*{columns}" placeholder="Enter Column Names Separated by Comma(,)" required="required">
+                    <input class="form-control w-100 mb-4" type="text" id="columns" th:field="*{columns}"
+                           placeholder="Enter Column Names Separated by Comma(,)" required="required">
                 </div>
 
                 <!-- ParamDTO List -->
@@ -46,33 +53,31 @@
                         <label th:for="'paramDTO[' + ${paramStat.index} + '].paramValue'">Parameter Value:</label>
                         <input type="text" th:field="*{paramsList[__${paramStat.index}__].paramValue}">
 
-                        <button type="button" class="remove-param-button btn btn-danger btn-sm m-1" th:attr="data-index=${paramStat.index}">Remove</button>
+                        <button type="button" class="remove-param-button btn btn-danger btn-sm m-1"
+                                th:attr="data-index=${paramStat.index}">Remove
+                        </button>
 
                     </div>
 
                 </div>
 
                 <div class="w-50">
-                    <button type="button" id="add-param-button" class="btn btn-secondary btn-sm my-1" style="width: 120px; height: 35px;">Add Parameter</button>
+                    <button type="button" id="add-param-button" class="btn btn-secondary btn-sm my-1"
+                            style="width: 120px; height: 35px;">Add Parameter
+                    </button>
                 </div>
 
             </div>
 
-<!--            <input type="text" th:field="*{reportName}" class="form-control mb-4 w-100" placeholder="Enter Report Name" />-->
-
-<!--            <input type="text" th:field="*{query}" class="form-control w-100 mb-4" placeholder="Enter SQL Query" />-->
-
-<!--            <input type="text" th:field="*{columns}" class="form-control w-100 mb-4" placeholder="Enter Column Names Separated by Comma(,)" />-->
-
             <hr/>
             <button type="submit" class="btn btn-primary" style="width: 100px;">Save</button>
-            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{id}"/>
 
         </form>
 
-        <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info mr-1">Run</a>
-        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mr-1">Download</a>
-        <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-info">Delete</a>
+        <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-warning mr-1 mt-2">Run</a>
+        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mr-1 mt-2">Download</a>
+        <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2">Delete</a>
 
     </div>
 
@@ -83,7 +88,7 @@
 
 <script th:inline="javascript">
     // JavaScript code for adding and removing parameters
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const paramsList = document.getElementById("paramsList");
 
         // Function to remove a parameter element
@@ -91,7 +96,7 @@
             paramElement.remove();
         }
 
-        paramsList.addEventListener("click", function(event) {
+        paramsList.addEventListener("click", function (event) {
             if (event.target.classList.contains("remove-param-button")) {
                 const paramElement = event.target.closest(".param");
                 if (paramElement) {
@@ -101,7 +106,7 @@
         });
 
         const addParamButton = document.getElementById("add-param-button");
-        addParamButton.addEventListener("click", function() {
+        addParamButton.addEventListener("click", function () {
             const paramIndex = paramsList.childElementCount;
             const newParam = document.createElement("div");
             newParam.classList.add("param");
@@ -118,6 +123,10 @@
         });
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 
 </body>
+
 </html>

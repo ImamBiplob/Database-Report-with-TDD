@@ -187,13 +187,6 @@ public class ReportService {
 
         publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
 
-//        EmailDetails emailDetails = new EmailDetails();
-//        emailDetails.setAttachment(filePath);
-//        emailDetails.setSubject("Report of " + report.getReportName());
-//        emailDetails.setRecipient("imamhbiplob@gmail.com");
-//        emailDetails.setMsgBody("Hello,\n\nReport file of last execution is attached with the mail.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
-//        emailService.sendMailWithAttachment(emailDetails);
-
         return results;
 
     }

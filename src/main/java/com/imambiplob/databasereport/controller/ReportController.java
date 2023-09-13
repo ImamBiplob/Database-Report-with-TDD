@@ -148,6 +148,8 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
+        reportService.deleteReport(id);
+
         return "redirect:/api/reports/view";
 
     }
