@@ -51,43 +51,37 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    public String
-    sendMailWithAttachment(EmailDetails details)
+    public void sendMailWithAttachment(EmailDetails details)
     {
         // Creating a mime message
-        MimeMessage mimeMessage
-                = javaMailSender.createMimeMessage();
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
 
         try {
 
             // Setting multipart as true for attachments to be sending
-            mimeMessageHelper
-                    = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
             mimeMessageHelper.setFrom(sender);
             mimeMessageHelper.setTo(details.getRecipient());
             mimeMessageHelper.setText(details.getMsgBody());
-            mimeMessageHelper.setSubject(
-                    details.getSubject());
+            mimeMessageHelper.setSubject(details.getSubject());
 
             // Adding the attachment
-            FileSystemResource file
-                    = new FileSystemResource(
-                    new File(details.getAttachment()));
+            FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
 
-            mimeMessageHelper.addAttachment(
-                    Objects.requireNonNull(file.getFilename()), file);
+            mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
             // Sending the mail
             javaMailSender.send(mimeMessage);
-            return "Mail sent Successfully";
+            //return "Mail sent Successfully";
         }
 
         // Catch block to handle MessagingException
         catch (MessagingException e) {
 
+            System.out.println(e.getMessage());
             // Display message when exception occurred
-            return "Error while sending mail!!!";
+            //return "Error while sending mail!!!";
         }
     }
 }

@@ -38,13 +38,15 @@ public class ReportService {
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
     private final EmailService emailService;
+    private final CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult;
 
-    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
         this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
         this.emailService = emailService;
+        this.csvExportServiceForSingleColumnResult = csvExportServiceForSingleColumnResult;
     }
 
     public static ReportDTO convertReportToReportDTO(Report report) {
@@ -173,7 +175,7 @@ public class ReportService {
     }
 
     @Transactional
-    public List<Object[]> runReport(long id) {
+    public List runReport(long id) {
 
         User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
 
@@ -181,7 +183,7 @@ public class ReportService {
 
         String filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
 
-        List<Object[]> results = performExecution(report, filePath);
+        List results = performExecution(report, filePath);
 
         publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
 
@@ -215,16 +217,29 @@ public class ReportService {
 
     }
 
-    public List<Object[]> performExecution(Report report, String filePath) {
+    public List performExecution(Report report, String filePath) {
 
         Object[] columns = null;
 
         if(report.getColumns() != null)
             columns = Arrays.stream(report.getColumns().trim().split(",")).toArray();
 
-        List<Object[]> results = getResults(report);
+        File file;
+        List results;
 
-        File file = csvExportService.exportQueryResultToCsv(results, filePath, columns);
+        assert columns != null;
+        if(columns.length > 1) {
+
+            results = getResults(report);
+            file = csvExportService.exportQueryResultToCsv(results, filePath, columns);
+
+        }
+        else {
+
+            results = getResults(report);
+            file = csvExportServiceForSingleColumnResult.exportQueryResultToCsv(results, filePath, columns);
+
+        }
 
         MultipartFile multipartFile = new MultipartFileImplementation(file);
 
@@ -234,7 +249,7 @@ public class ReportService {
 
     }
 
-    public List<Object[]> getResults(Report report) {
+    public List getResults(Report report) {
 
         Query query = entityManager.createNativeQuery(report.getQuery());
 
@@ -242,7 +257,7 @@ public class ReportService {
             query.setParameter(paramName, report.getParamsMap().get(paramName));
         }
 
-        return (List<Object[]>) query.getResultList();
+        return query.getResultList();
 
     }
 
