@@ -142,6 +142,16 @@ public class ReportController {
 
     }
 
+    @GetMapping("/delete/{id}")
+    public String deleteReportById(@PathVariable long id) throws ReportNotFoundException {
+
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        return "redirect:/api/reports/view";
+
+    }
+
     @PostMapping
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {
 

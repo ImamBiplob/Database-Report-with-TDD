@@ -71,7 +71,8 @@
         </form>
 
         <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-info mr-1">Run</a>
-        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info">Download</a>
+        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mr-1">Download</a>
+        <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-info">Delete</a>
 
     </div>
 
