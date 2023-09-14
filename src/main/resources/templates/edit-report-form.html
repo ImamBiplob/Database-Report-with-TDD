@@ -3,6 +3,8 @@
 
 <head>
 
+    <meta charset="UTF-8">
+
     <title>Edit Report</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -14,114 +16,96 @@
 
 <body>
 
-<div class="container mt-5" th:object="${report}">
+<div class="container my-5" th:object="${report}">
 
     <h3>Edit Report</h3>
     <hr/>
 
     <div class="my-2 w-100">
 
-        <form id="ReportForm" class="w-100" th:action="@{/api/reports/updateReport}" method="POST">
+        <form class="w-100" th:action="@{/api/reports/updateReport}" method="post" th:object="${report}">
 
-            <div class="w-100 d-flex flex-column">
-                <div>
-                    <label for="reportName">Report Name:</label>
-                    <input class="form-control w-100 mb-4" type="text" id="reportName" th:field="*{reportName}"
-                           placeholder="Enter Report Name" required="required">
-                    <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
-                </div>
-                <div>
-                    <label for="query">SQL Query:</label>
-                    <textarea class="form-control w-100 mb-4" id="query" th:field="*{query}"
-                              placeholder="Enter SQL Query" required="required"></textarea>
-                    <span th:if="${#fields.hasErrors('query')}" th:errors="*{query}"></span>
-                </div>
-                <div>
-                    <label for="columns">Columns:</label>
-                    <input class="form-control w-100 mb-4" type="text" id="columns" th:field="*{columns}"
-                           placeholder="Enter Column Names Separated by Comma(,)" required="required">
-                </div>
-
-                <!-- ParamDTO List -->
-                <div id="paramsList" class="mb-2" th:each="paramItem, paramStat : *{paramsList}">
-
-                    <div class="param" th:id="'param_' + ${paramStat.index}">
-
-                        <label th:for="'paramDTO[' + ${paramStat.index} + '].paramName'">Parameter Name:</label>
-                        <input type="text" th:field="*{paramsList[__${paramStat.index}__].paramName}">
-
-                        <label th:for="'paramDTO[' + ${paramStat.index} + '].paramValue'">Parameter Value:</label>
-                        <input type="text" th:field="*{paramsList[__${paramStat.index}__].paramValue}">
-
-                        <button type="button" class="remove-param-button btn btn-danger btn-sm m-1"
-                                th:attr="data-index=${paramStat.index}">Remove
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="w-50">
-                    <button type="button" id="add-param-button" class="btn btn-secondary btn-sm my-1"
-                            style="width: 120px; height: 35px;">Add Parameter
-                    </button>
-                </div>
-
+            <div>
+                <label>Report Name:</label>
+                <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}"
+                       placeholder="Enter Report Name" required="required"/>
+                <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
+            <div>
+                <label>SQL Query:</label>
+                <textarea class="form-control w-100 mb-4" th:field="*{query}" placeholder="Enter SQL Query"
+                          required="required"></textarea>
+                <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
+            </div>
+
+            <div>
+                <label>Columns:</label>
+                <input class="form-control w-100 mb-4" type="text" th:field="*{columns}"
+                       placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
+                <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
+            </div>
+
+            <div id="params-container">
+                <!-- Iterate over the paramsList and create input fields for ParamDTO objects -->
+                <div class="param-row" th:each="paramItem, paramIndex : *{paramsList}">
+
+                    <label>Parameter Name:</label>
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramName}" class="my-1"
+                           placeholder="Enter Parameter Name">
+
+                    <label>Parameter Value:</label>
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1"
+                           placeholder="Enter Parameter Value">
+
+                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1"
+                            onclick="removeParamRow(this)">Remove
+                    </button>
+
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm my-1" style="width: 120px; height: 35px;"
+                    onclick="addParamRow()">Add Parameter
+            </button>
+
             <hr/>
-            <button type="submit" class="btn btn-primary" style="width: 100px;">Save</button>
+
+            <div>
+                <button type="submit" class="btn btn-primary" style="width: 100px;">Save</button>
+            </div>
+
             <input type="hidden" th:field="*{id}"/>
 
         </form>
 
-        <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-warning mr-1 mt-2">Run</a>
-        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mr-1 mt-2">Download</a>
+        <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-warning me-1 mt-2">Run</a>
+        <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info me-1 mt-2">Download</a>
         <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2">Delete</a>
 
     </div>
 
     <hr/>
+
     <a th:href="@{/api/reports/view}">Back to Report List</a>
 
 </div>
 
-<script th:inline="javascript">
-    // JavaScript code for adding and removing parameters
-    document.addEventListener("DOMContentLoaded", function () {
-        const paramsList = document.getElementById("paramsList");
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // JavaScript function to add a new ParamDTO input row
+    function addParamRow() {
+        const newRow = $('<div class="param-row">');
+        newRow.append('<label>Parameter Name:</label> <input type="text" class="me-1 my-1" name="paramsList[' + ($('.param-row').length) + '].paramName" placeholder="Enter Parameter Name">');
+        newRow.append('<label>Parameter Value:</label> <input type="text" class="me-1 my-1" name="paramsList[' + ($('.param-row').length) + '].paramValue" placeholder="Enter Parameter Value">');
+        newRow.append('<button type="button" class="remove-param-button btn btn-danger btn-sm m-1" onclick="removeParamRow(this)">Remove</button>');
+        $('#params-container').append(newRow);
+    }
 
-        // Function to remove a parameter element
-        function removeParamElement(paramElement) {
-            paramElement.remove();
-        }
-
-        paramsList.addEventListener("click", function (event) {
-            if (event.target.classList.contains("remove-param-button")) {
-                const paramElement = event.target.closest(".param");
-                if (paramElement) {
-                    removeParamElement(paramElement);
-                }
-            }
-        });
-
-        const addParamButton = document.getElementById("add-param-button");
-        addParamButton.addEventListener("click", function () {
-            const paramIndex = paramsList.childElementCount;
-            const newParam = document.createElement("div");
-            newParam.classList.add("param");
-            newParam.innerHTML = `
-                <label for="paramDTO[${paramIndex}].paramName">Parameter Name:</label>
-                <input type="text" id="paramDTO[${paramIndex}].paramName" name="paramDTO[${paramIndex}].paramName">
-
-                <label for="paramDTO[${paramIndex}].paramValue">Parameter Value:</label>
-                <input type="text" id="paramDTO[${paramIndex}].paramValue" name="paramDTO[${paramIndex}].paramValue">
-
-                <button type="button" class="remove-param-button btn btn-danger btn-sm m-1">Remove</button>
-            `;
-            paramsList.appendChild(newParam);
-        });
-    });
+    // JavaScript function to remove a ParamDTO input row
+    function removeParamRow(button) {
+        $(button).parent().remove();
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"

@@ -83,7 +83,7 @@ public class ReportService {
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
         report.setReportCreator(user);
-        report.getParamsMap().remove("","");
+        report.getParamsMap().remove("");
 
         return report;
 
@@ -147,7 +147,7 @@ public class ReportService {
         report.setColumns(reportDTO.getColumns());
         report.setParamsMap(reportDTO.getParamsMap());
         report.setLastUpdateTime(new Date());
-        report.getParamsMap().remove("","");
+        report.getParamsMap().remove("");
 
         return convertReportToReportDTO(reportRepository.save(report));
 

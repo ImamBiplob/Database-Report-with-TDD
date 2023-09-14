@@ -77,7 +77,7 @@ public class ReportController {
         }
 
         reportDTO.setParamsMap(paramsMap);
-        reportDTO.getParamsMap().remove("","");
+        reportDTO.getParamsMap().remove("");
 
         return reportDTO;
 
