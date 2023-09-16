@@ -4,6 +4,7 @@ import com.imambiplob.databasereport.dto.HistoryDTO;
 import com.imambiplob.databasereport.entity.ReportExecutionHistory;
 import com.imambiplob.databasereport.event.ReportExecutionEventForHistory;
 import com.imambiplob.databasereport.repository.HistoryRepository;
+import com.imambiplob.databasereport.util.Converter;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.imambiplob.databasereport.util.Converter.convertHistoryToHistoryDTO;
+
 @Service
 public class HistoryService {
 
@@ -21,24 +24,6 @@ public class HistoryService {
 
     public HistoryService(HistoryRepository historyRepository) {
         this.historyRepository = historyRepository;
-    }
-
-    public static HistoryDTO convertHistoryToHistoryDTO(ReportExecutionHistory history) {
-
-        if(history == null)
-            return null;
-
-        HistoryDTO historyDTO = new HistoryDTO();
-        historyDTO.setId(history.getId());
-        historyDTO.setReportId(history.getReport().getId());
-        historyDTO.setReportName(history.getReportName());
-        historyDTO.setReportExecutorName(history.getReportExecutor().getUsername());
-        historyDTO.setSqlQuery(history.getSqlQuery());
-        historyDTO.setParamsMap(history.getParamsMap());
-        historyDTO.setExecutionTime(history.getExecutionTime());
-
-        return historyDTO;
-
     }
 
     @EventListener
@@ -63,7 +48,7 @@ public class HistoryService {
 
     public List<HistoryDTO> getHistories() {
 
-        return historyRepository.findAll().stream().map(HistoryService::convertHistoryToHistoryDTO).toList();
+        return historyRepository.findAll().stream().map(Converter::convertHistoryToHistoryDTO).toList();
 
     }
 
@@ -71,7 +56,7 @@ public class HistoryService {
 
         return  historyRepository.findAll(Sort.by(Sort.Direction.ASC, field))
                 .stream()
-                .map(HistoryService::convertHistoryToHistoryDTO)
+                .map(Converter::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
     }
@@ -81,7 +66,7 @@ public class HistoryService {
         return historyRepository.findAll(PageRequest.of(offset, pageSize))
                 .getContent()
                 .stream()
-                .map(HistoryService::convertHistoryToHistoryDTO)
+                .map(Converter::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
     }
@@ -91,7 +76,7 @@ public class HistoryService {
         return historyRepository.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by(field)))
                 .getContent()
                 .stream()
-                .map(HistoryService::convertHistoryToHistoryDTO)
+                .map(Converter::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
     }
@@ -108,7 +93,7 @@ public class HistoryService {
     public List<HistoryDTO> getHistoryOfReport(long reportId) {
 
         return historyRepository.findReportExecutionHistoriesByReportIdIs(reportId)
-                .stream().map(HistoryService::convertHistoryToHistoryDTO)
+                .stream().map(Converter::convertHistoryToHistoryDTO)
                 .toList();
 
     }

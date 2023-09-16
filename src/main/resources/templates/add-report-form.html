@@ -53,17 +53,17 @@
                     <label>Parameter Value:</label>
                     <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1" placeholder="Enter Parameter Value">
 
-                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1" onclick="removeParamRow(this)">Remove</button>
+                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1 shadow" onclick="removeParamRow(this)">Remove</button>
 
                 </div>
             </div>
 
-            <button type="button" class="btn btn-secondary btn-sm my-1" style="width: 120px; height: 35px;" onclick="addParamRow()">Add Parameter</button>
+            <button type="button" class="btn btn-secondary btn-sm my-1 shadow" style="width: 120px; height: 35px;" onclick="addParamRow()">Add Parameter</button>
 
             <hr/>
 
             <div>
-                <button type="submit" class="btn btn-primary" style="width: 100px;">Save</button>
+                <button type="submit" class="btn btn-primary shadow-lg" style="width: 100px;">Save</button>
             </div>
 
             <input type="hidden" th:field="*{id}"/>
@@ -73,7 +73,6 @@
     </div>
 
     <hr/>
-
     <a th:href="@{/api/reports/view}">Back to Report List</a>
 
 </div>
@@ -85,7 +84,7 @@
         const newRow = $('<div class="param-row">');
         newRow.append('<label>Parameter Name:</label> <input type="text" class="me-1 my-1" name="paramsList[' + ($('.param-row').length) + '].paramName" placeholder="Enter Parameter Name">');
         newRow.append('<label>Parameter Value:</label> <input type="text" class="me-1 my-1" name="paramsList[' + ($('.param-row').length) + '].paramValue" placeholder="Enter Parameter Value">');
-        newRow.append('<button type="button" class="remove-param-button btn btn-danger btn-sm m-1" onclick="removeParamRow(this)">Remove</button>');
+        newRow.append('<button type="button" class="remove-param-button btn btn-danger btn-sm m-1 shadow" onclick="removeParamRow(this)">Remove</button>');
         $('#params-container').append(newRow);
     }
 

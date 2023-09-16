@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Execution History of Report</title>
+    <title>Execution Result of Report</title>
 
     <link rel="stylesheet"
           type="text/css"
@@ -17,37 +17,29 @@
 
 <body>
 
-<div class="container-100 m-5 px-5">
+<div class="container-100 m-5 px-5" th:object="${report}">
 
-    <h3>Execution History of Report</h3>
+    <h3 th:text="${report.reportName}"/>
     <hr/>
 
-    <table class="table table-bordered table-striped table-success table-hover shadow" id="historyTable">
+    <table class="table table-bordered table-striped table-success table-hover shadow" id="resultTable">
 
         <thead>
         <tr>
-            <th>History ID</th>
-            <th>Report ID</th>
-            <th>Report Name</th>
-            <th>Report Execution Time</th>
-            <th>Report Executor Name</th>
-            <th>Action</th>
+            <th th:each="columnName : ${runResult.columns}" th:text="${columnName}"></th>
         </tr>
         </thead>
 
         <tbody>
-        <tr th:each="h: ${history}">
-            <td th:text="${h.id}"/>
-            <td th:text="${h.reportId}"/>
-            <td th:text="${h.reportName}"/>
-            <td th:text="${h.executionTime}"/>
-            <td th:text="${h.reportExecutorName}"/>
-            <td><a th:href="@{/api/histories/view/details(id=${h.id})}" class="btn btn-info m-1 shadow">History Details</a>
-            </td>
+        <tr th:each="row : ${runResult.results}">
+            <!-- Iterate over each column in the row -->
+            <td th:each="columnValue : ${row}" th:text="${columnValue}"></td>
         </tr>
         </tbody>
 
     </table>
+
+    <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download</a>
 
     <hr/>
     <a th:href="@{/api/reports/view}">Back to Report List</a>
@@ -58,10 +50,10 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
 <script>
     $(document).ready(function () {
-        $("#historyTable").DataTable({
+        $("#resultTable").DataTable({
             'aoColumnDefs': [{
                 'bSortable': false,
-                'aTargets': [-1] /* 1st one, start by the right */
+                'aTargets': []
             }]
         });
     })

@@ -3,6 +3,7 @@ package com.imambiplob.databasereport.controller;
 import com.imambiplob.databasereport.dto.ParamDTO;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.ReportView;
+import com.imambiplob.databasereport.dto.RunResult;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.service.ReportService;
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.imambiplob.databasereport.util.Converter.convertReportDTOToReportView;
+import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
 
 @Controller
 //@RestController
@@ -27,60 +28,6 @@ public class ReportController {
 
     public ReportController(ReportService reportService) {
         this.reportService = reportService;
-    }
-
-    public static ReportView convertReportDTOToReportView(ReportDTO reportDTO) {
-
-        ReportView reportView = new ReportView();
-        reportView.setId(reportDTO.getId());
-        reportView.setReportName(reportDTO.getReportName());
-        reportView.setColumns(reportDTO.getColumns());
-        reportView.setQuery(reportDTO.getQuery());
-        reportView.setReportCreatorName(reportDTO.getReportCreatorName());
-        reportView.setCreationTime(reportDTO.getCreationTime());
-        reportView.setLastUpdateTime(reportDTO.getLastUpdateTime());
-        reportView.setDownloadLink(reportDTO.getDownloadLink());
-        List<ParamDTO> paramsList = new ArrayList<>();
-
-        for(String paramName : reportDTO.getParamsMap().keySet()) {
-            ParamDTO param = new ParamDTO();
-            param.setParamName(paramName);
-            param.setParamValue(reportDTO.getParamsMap().get(paramName));
-            paramsList.add(param);
-        }
-
-        reportView.setParamsList(paramsList);
-
-        return reportView;
-
-    }
-
-    public static ReportDTO convertReportViewToReportDTO(ReportView reportView) {
-
-        ReportDTO reportDTO = new ReportDTO();
-        reportDTO.setId(reportView.getId());
-        reportDTO.setReportName(reportView.getReportName());
-        reportDTO.setQuery(reportView.getQuery());
-        reportDTO.setColumns(reportView.getColumns());
-        reportDTO.setReportCreatorName(reportView.getReportCreatorName());
-        reportDTO.setCreationTime(reportView.getCreationTime());
-        reportDTO.setLastUpdateTime(reportView.getLastUpdateTime());
-        reportDTO.setDownloadLink(reportView.getDownloadLink());
-        Map<String, String> paramsMap = new HashMap<>();
-
-        if(reportView.getParamsList() != null) {
-            if(!reportView.getParamsList().isEmpty()) {
-                for (ParamDTO paramDTO : reportView.getParamsList()) {
-                    paramsMap.put(paramDTO.getParamName(), paramDTO.getParamValue());
-                }
-            }
-        }
-
-        reportDTO.setParamsMap(paramsMap);
-        reportDTO.getParamsMap().remove("");
-
-        return reportDTO;
-
     }
 
     @PostMapping("/saveReport")
@@ -153,6 +100,24 @@ public class ReportController {
         return "redirect:/api/reports/view";
 
     }
+
+    @GetMapping("/view/runResult/{id}")
+    public ModelAndView runAndView(@PathVariable long id) throws ReportNotFoundException {
+
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        RunResult runResult = reportService.runReport(id);
+
+        ModelAndView mav = new ModelAndView("list-run-result");
+        mav.addObject("runResult", runResult);
+        mav.addObject("report", reportService.getReportById(id));
+
+        return mav;
+
+    }
+
+    /* REST APIs Start from Here... */
 
     @PostMapping
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {

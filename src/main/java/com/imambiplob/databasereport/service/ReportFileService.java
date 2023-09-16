@@ -6,6 +6,7 @@ import com.imambiplob.databasereport.entity.ReportFile;
 import com.imambiplob.databasereport.event.ReportExecutionEventForFile;
 import com.imambiplob.databasereport.repository.ReportFileRepository;
 import com.imambiplob.databasereport.repository.ReportRepository;
+import com.imambiplob.databasereport.util.Converter;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+
+import static com.imambiplob.databasereport.util.Converter.convertReportFileToReportFileDTO;
 
 @Service
 public class ReportFileService {
@@ -25,21 +28,6 @@ public class ReportFileService {
     public ReportFileService(ReportFileRepository reportFileRepository, ReportRepository reportRepository) {
         this.reportFileRepository = reportFileRepository;
         this.reportRepository = reportRepository;
-    }
-
-    public static ReportFileDTO convertReportFileToReportFileDTO(ReportFile reportFile) {
-
-        String fileDownloadUri = reportFile.getReport().getDownloadLink();
-
-        ReportFileDTO reportFileDTO = new ReportFileDTO();
-        reportFileDTO.setFileName(reportFile.getFileName());
-        reportFileDTO.setReportId(reportFile.getReport().getId());
-        reportFileDTO.setUri(fileDownloadUri);
-        reportFileDTO.setFiletype(reportFile.getFileType());
-        reportFileDTO.setSize(reportFile.getData().length);
-
-        return reportFileDTO;
-
     }
 
     @EventListener
@@ -78,8 +66,6 @@ public class ReportFileService {
 
         }
 
-
-
     }
 
     public ReportFile getReportFile(String id) {
@@ -103,7 +89,7 @@ public class ReportFileService {
     public List<ReportFileDTO> getAllFiles() {
 
         return reportFileRepository.findAll().stream()
-                .map(ReportFileService::convertReportFileToReportFileDTO)
+                .map(Converter::convertReportFileToReportFileDTO)
                 .toList();
 
     }

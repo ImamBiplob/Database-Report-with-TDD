@@ -1,6 +1,7 @@
 package com.imambiplob.databasereport;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
+import com.imambiplob.databasereport.dto.RunResult;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.HistoryRepository;
@@ -151,9 +152,9 @@ public class DatabaseReportServiceTests {
 
         reportRepository.save(report);
 
-        List<Object[]> results = reportService.runReport(report.getId());
+        RunResult runResult = reportService.runReport(report.getId());
 
-        Assertions.assertNotNull(results);          /* If report exists and sql is valid, result will not be null */
+        Assertions.assertNotNull(runResult);          /* If report exists and sql is valid, result will not be null */
 
         /* Successful run operation results in successful history creation */
 

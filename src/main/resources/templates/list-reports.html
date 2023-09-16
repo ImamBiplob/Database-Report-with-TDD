@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>List of Report</title>
+    <title>List of Reports</title>
 
     <link rel="stylesheet"
           type="text/css"
@@ -19,10 +19,10 @@
 
 <div class="container-100 m-5 px-5">
 
-    <h3>List of Report</h3>
+    <h3>List of Reports</h3>
 
     <hr/>
-    <a th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary">Add New Report</a>
+    <a th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
     <br/><br/>
 
     <table class="table table-bordered table-striped table-success table-hover shadow" id="reportTable">
@@ -46,13 +46,11 @@
             <td th:text="${report.lastUpdateTime}"/>
             <td th:text="${report.reportCreatorName}"/>
             <td>
-                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 ms-1">Edit</a>
-                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1">Execution
+                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Edit</a>
+                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
                     History</a>
-                <a th:href="@{/api/reports/run/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1">Run</a>
-                <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}"
-                   class="btn btn-info my-1 ms-1">Download</a>
-                <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1">Delete</a>
+                <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
+                <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
             </td>
         </tr>
         </tbody>
