@@ -20,6 +20,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String name;
+
     @Column(unique = true)
     @NotBlank(message = "Username must not be blank")
     private String username;
@@ -33,6 +35,8 @@ public class User {
     private String password;
 
     private String phone;
+
+    private String roles;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
     private List<ReportExecutionHistory> executionHistoryList;
