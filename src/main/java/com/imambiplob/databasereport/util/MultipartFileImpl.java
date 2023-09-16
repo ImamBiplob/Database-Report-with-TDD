@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-public class MultipartFileImplementation implements MultipartFile {
+public class MultipartFileImpl implements MultipartFile {
 
     private final File file;
 
-    public MultipartFileImplementation(File file) {
+    public MultipartFileImpl(File file) {
 
         this.file = file;
 

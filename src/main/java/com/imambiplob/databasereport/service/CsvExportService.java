@@ -11,6 +11,26 @@ import java.util.List;
 @Service
 public class CsvExportService {
 
+    public static CSVWriter writeColumnNames(FileWriter fileWriter, Object[] columns) {
+
+        CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+        if (columns != null) {
+
+            String[] columnNames = new String[columns.length];
+
+            for (int i = 0; i < columns.length; i++) {
+                columnNames[i] = String.valueOf(columns[i]);  /* Writing column names */
+            }
+
+            csvWriter.writeNext(columnNames);
+
+        }
+
+        return csvWriter;
+
+    }
+
     public File exportQueryResultToCsv(List<Object[]> results, String filePath, Object[] columns) {
 
         File file = new File(filePath);
@@ -18,19 +38,7 @@ public class CsvExportService {
         try {
 
             FileWriter fileWriter = new FileWriter(filePath);
-            CSVWriter csvWriter = new CSVWriter(fileWriter);
-
-            if (columns != null) {
-
-                String[] columnNames = new String[columns.length];
-
-                for (int i = 0; i < columns.length; i++) {
-                    columnNames[i] = String.valueOf(columns[i]);  /* Writing column names */
-                }
-
-                csvWriter.writeNext(columnNames);
-
-            }
+            CSVWriter csvWriter = writeColumnNames(fileWriter, columns);
 
             /* Write the result rows */
             for (Object[] row : results) {

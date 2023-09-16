@@ -1,17 +1,26 @@
 package com.imambiplob.databasereport.controller;
 
+import com.imambiplob.databasereport.dto.ParamDTO;
 import com.imambiplob.databasereport.dto.ReportDTO;
+import com.imambiplob.databasereport.dto.ReportView;
+import com.imambiplob.databasereport.dto.RunResult;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
-@RestController
+import static com.imambiplob.databasereport.util.Converter.convertReportDTOToReportView;
+import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
+
+@Controller
+//@RestController
 @RequestMapping("api/reports")
 public class ReportController {
 
@@ -20,6 +29,95 @@ public class ReportController {
     public ReportController(ReportService reportService) {
         this.reportService = reportService;
     }
+
+    @PostMapping("/saveReport")
+    public String saveReport(@ModelAttribute ReportView reportView) {
+
+        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+        reportService.addReport(reportDTO);
+
+        return "redirect:/api/reports/view";
+
+    }
+
+    @PostMapping("/updateReport")
+    public String updateReport(@ModelAttribute ReportView reportView) {
+
+        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+        reportService.updateReport(reportDTO, reportDTO.getId());
+
+        return "redirect:/api/reports/view";
+
+    }
+
+    @GetMapping("/view")
+    public ModelAndView getReportsView() {
+
+        List<ReportDTO> reports = reportService.getReports();
+        ModelAndView mav = new ModelAndView("list-reports");
+        mav.addObject("reports", reports);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/addReportForm")
+    public ModelAndView addReportForm() {
+
+        ModelAndView mav = new ModelAndView("add-report-form");
+        ReportView newReport = new ReportView();
+        newReport.setParamsList(List.of(new ParamDTO()));
+        mav.addObject("report", newReport);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/editReportForm")
+    public ModelAndView editReportForm(@RequestParam long reportId) throws ReportNotFoundException {
+
+        if(reportService.getReportById(reportId) == null)
+            throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");
+
+        ModelAndView mav = new ModelAndView("edit-report-form");
+        ReportView report = convertReportDTOToReportView(reportService.getReportById(reportId));
+        if(report.getParamsList().isEmpty())
+            report.setParamsList(List.of(new ParamDTO()));
+        mav.addObject("report", report);
+
+        return mav;
+
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteReportById(@PathVariable long id) throws ReportNotFoundException {
+
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        reportService.deleteReport(id);
+
+        return "redirect:/api/reports/view";
+
+    }
+
+    @GetMapping("/view/runResult/{id}")
+    public ModelAndView runAndView(@PathVariable long id) throws ReportNotFoundException {
+
+        if(reportService.getReportById(id) == null)
+            throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
+
+        RunResult runResult = reportService.runReport(id);
+
+        ModelAndView mav = new ModelAndView("list-run-result");
+        mav.addObject("runResult", runResult);
+        mav.addObject("report", reportService.getReportById(id));
+
+        return mav;
+
+    }
+
+    /* REST APIs Start from Here... */
 
     @PostMapping
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {

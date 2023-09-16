@@ -34,10 +34,10 @@ public class User {
 
     private String phone;
 
-    @OneToMany(mappedBy = "reportExecutor")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
     private List<ReportExecutionHistory> executionHistoryList;
 
-    @OneToMany(mappedBy = "reportCreator")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
     private List<Report> reportList;
 
 }

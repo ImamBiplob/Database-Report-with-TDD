@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Execution Result of Report</title>
+
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<div class="container-100 m-5 px-5" th:object="${report}">
+
+    <h3 th:text="${report.reportName}"/>
+    <hr/>
+
+    <table class="table table-bordered table-striped table-success table-hover shadow" id="resultTable">
+
+        <thead>
+        <tr>
+            <th th:each="columnName : ${runResult.columns}" th:text="${columnName}"></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="row : ${runResult.results}">
+            <!-- Iterate over each column in the row -->
+            <td th:each="columnValue : ${row}" th:text="${columnValue}"></td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download</a>
+
+    <hr/>
+    <a th:href="@{/api/reports/view}">Back to Report List</a>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#resultTable").DataTable({
+            'aoColumnDefs': [{
+                'bSortable': false,
+                'aTargets': []
+            }]
+        });
+    })
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

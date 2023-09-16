@@ -28,6 +28,7 @@ public class Report {
     @NotBlank(message = "Query must not be blank")
     private String query;
 
+    @NotBlank(message = "Columns must not be blank")
     private String columns;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -45,8 +46,11 @@ public class Report {
 
     private Date lastUpdateTime;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
     private List<ReportExecutionHistory> executionHistoryList;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "report")
+    private ReportFile reportFile;
 
     private String downloadLink;
 
