@@ -29,7 +29,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getServletPath().matches("/api/users/login")) {
+        if (request.getServletPath().matches("/api/users/login|/api/users/login/view")) {
             filterChain.doFilter(request, response);
         }
         else {
@@ -51,6 +51,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With");
+            response.setHeader("Access-Control-Max-Age", "3600");
 
             filterChain.doFilter(request, response);
         }

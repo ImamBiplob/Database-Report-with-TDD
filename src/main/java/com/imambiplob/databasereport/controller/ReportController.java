@@ -21,7 +21,7 @@ import static com.imambiplob.databasereport.util.Converter.convertReportDTOToRep
 import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
 
 @Controller
-@RestController
+//@RestController
 @RequestMapping("api/reports")
 public class ReportController {
 

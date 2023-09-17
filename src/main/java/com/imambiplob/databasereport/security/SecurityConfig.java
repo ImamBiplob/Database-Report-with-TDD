@@ -2,6 +2,7 @@ package com.imambiplob.databasereport.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,12 +38,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/users/login").permitAll()
-                                .requestMatchers("/**")
-                                .authenticated())
+                        auth.requestMatchers("/api/users/login", "/api/users/login/view").permitAll()
+                                .requestMatchers("/api/reports/view","/**")
+                                .authenticated()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                .permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
 
     }
 

@@ -8,6 +8,7 @@ import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.security.JwtService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("api/users")
@@ -34,11 +36,38 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
+    @GetMapping("/login/view")
+    public ModelAndView login() {
 
+        ModelAndView mav = new ModelAndView("login-form");
+        LoginRequest loginRequest = new LoginRequest();
+        mav.addObject(loginRequest);
+
+        return mav;
+
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginAndRedirect(@Valid LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+        if (authentication.isAuthenticated()) {
+            String token = jwtService.generateToken(loginRequest.getUsername());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + token);
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .headers(headers)
+                    .header("Location", "/api/reports/view")
+                    .build();
+        } else {
+            throw new UsernameNotFoundException("Invalid User Request!!!");
+        }
+    }
 
     /* REST APIs Start from Here... */
 
-    @PostMapping("/login")
+    @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateAndGetToken(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager
