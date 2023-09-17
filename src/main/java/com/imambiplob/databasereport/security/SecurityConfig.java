@@ -38,11 +38,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/users/login", "/api/users/login/view").permitAll()
+                        auth.requestMatchers("/api/users/login", "/api/users/login/view", "/api/users/authenticate").permitAll()
                                 .requestMatchers("/api/reports/view","/**")
                                 .authenticated()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                                 .permitAll())
+                .formLogin(login -> login.loginPage("/api/users/login/view"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)

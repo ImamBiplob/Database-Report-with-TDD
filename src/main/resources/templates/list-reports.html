@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html id="resultContainer" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -22,7 +22,7 @@
     <h3>List of Reports</h3>
 
     <hr/>
-    <a th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
+    <a id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
     <br/><br/>
 
     <table class="table table-bordered table-striped table-success table-hover shadow" id="reportTable">
@@ -49,7 +49,7 @@
                 <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Edit</a>
                 <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
                     History</a>
-                <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
+                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
                 <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
             </td>
         </tr>
@@ -58,6 +58,114 @@
     </table>
 
 </div>
+
+<!--<script th:inline="javascript">-->
+<!--    // Attach a click event handler to the "Add New Report" button-->
+<!--    document.getElementById("addReportButton").addEventListener("click", function () {-->
+<!--        // Retrieve the JWT token from local storage-->
+<!--        const token = localStorage.getItem("token");-->
+
+<!--        // Check if the token exists in local storage-->
+<!--        if (token) {-->
+<!--            // Perform the API request with the "Authorization" header-->
+<!--            fetch("/api/reports/view/addReportForm", {-->
+<!--                method: "GET",-->
+<!--                headers: {-->
+<!--                    "Authorization": `Bearer ${token}`-->
+<!--                }-->
+<!--            })-->
+<!--                .then((response) => response.text()) // Convert the response to text-->
+<!--                .then((html) => {-->
+<!--                    console.log(html)-->
+<!--                    // Update the content of a specific element with the received HTML-->
+<!--                    document.getElementById("contentContainer").innerHTML = html;-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    // Handle network or other errors-->
+<!--                    console.error("API request error:", error);-->
+<!--                });-->
+<!--        } else {-->
+<!--            // Token is not available in local storage, handle accordingly-->
+<!--            console.error("JWT token not found in local storage");-->
+<!--            // You can redirect to the login page or display an error message here-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // Attach a click event handler to the "Run" button
+        $("#addReportButton").click(function() {
+            // Get the URL from the button's href attribute
+            // const url = $("#addReportButton").attr("href");
+
+            const token = localStorage.getItem("token");
+
+            // Make sure a token exists before making the request
+            if (!token) {
+                alert("JWT token not found in local storage. Please log in.");
+                return;
+            }
+            // Make an AJAX request to the API
+            $.ajax({
+                url: 'http://localhost:9191/api/reports/view/addReportForm',
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                success: function(data) {
+                    // Assuming the API response contains the HTML content
+                    // Display the HTML content in the result container
+                    $("#resultContainer").html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+
+            // Prevent the default behavior of the link
+            return false;
+        });
+    });
+</script>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // Attach a click event handler to the "Run" button
+        $("#runButton").click(function() {
+            // Get the URL from the button's href attribute
+            const url = $("#runButton").attr("href");
+
+            const token = localStorage.getItem("token");
+
+            // Make sure a token exists before making the request
+            if (!token) {
+                alert("JWT token not found in local storage. Please log in.");
+                return;
+            }
+
+            // Make an AJAX request to the API
+            $.ajax({
+                url: url,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                success: function(data) {
+                    // Assuming the API response contains the HTML content
+                    // Display the HTML content in the result container
+                    $("#resultContainer").html(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+
+            // Prevent the default behavior of the link
+            return false;
+        });
+    });
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>

@@ -8,18 +8,22 @@ import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.security.JwtService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+@Controller
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -39,6 +43,8 @@ public class UserController {
     @GetMapping("/login/view")
     public ModelAndView login() {
 
+        createSysRoot();
+
         ModelAndView mav = new ModelAndView("login-form");
         LoginRequest loginRequest = new LoginRequest();
         mav.addObject(loginRequest);
@@ -48,18 +54,26 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginAndRedirect(@Valid LoginRequest loginRequest) {
+    public ResponseEntity<?> loginAndRedirect(@Valid LoginRequest loginRequest) throws URISyntaxException {
+
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         if (authentication.isAuthenticated()) {
+
             String token = jwtService.generateToken(loginRequest.getUsername());
+
+            URI uri = new URI("http://localhost:9191/");
+
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + token);
-            return ResponseEntity.status(HttpStatus.SEE_OTHER)
-                    .headers(headers)
-                    .header("Location", "/api/reports/view")
-                    .build();
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            return restTemplate.exchange(uri+"/api/reports/view", HttpMethod.GET, entity, String.class);
+
         } else {
             throw new UsernameNotFoundException("Invalid User Request!!!");
         }
@@ -104,5 +118,19 @@ public class UserController {
         if(userRepository.findById(id).isPresent())
             return new ResponseEntity<>(userRepository.findById(id).get(), HttpStatus.OK);
         return new ResponseEntity<>(new ResponseMessage("User with ID: " + id + " doesn't exist"), HttpStatus.NOT_FOUND);
+    }
+
+    public void createSysRoot() {
+        if(userRepository.findUserByUsername("imambiplob") == null) {
+            User user = new User();
+            user.setName("Imam Hossain");
+            user.setUsername("imambiplob");
+            user.setPassword(passwordEncoder.encode("imam123"));
+            user.setEmail("imamhbiplob@gmail.com");
+            user.setPhone("01521559190");
+            user.setRoles("SYS_ROOT,DEVELOPER");
+
+            userRepository.save(user);
+        }
     }
 }
