@@ -10,6 +10,7 @@ import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,7 +21,7 @@ import static com.imambiplob.databasereport.util.Converter.convertReportDTOToRep
 import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
 
 @Controller
-//@RestController
+@RestController
 @RequestMapping("api/reports")
 public class ReportController {
 
@@ -31,6 +32,7 @@ public class ReportController {
     }
 
     @PostMapping("/saveReport")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String saveReport(@ModelAttribute ReportView reportView) {
 
         ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
@@ -41,6 +43,7 @@ public class ReportController {
     }
 
     @PostMapping("/updateReport")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String updateReport(@ModelAttribute ReportView reportView) {
 
         ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
@@ -62,6 +65,7 @@ public class ReportController {
     }
 
     @GetMapping("/view/addReportForm")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ModelAndView addReportForm() {
 
         ModelAndView mav = new ModelAndView("add-report-form");
@@ -74,6 +78,7 @@ public class ReportController {
     }
 
     @GetMapping("/view/editReportForm")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ModelAndView editReportForm(@RequestParam long reportId) throws ReportNotFoundException {
 
         if(reportService.getReportById(reportId) == null)
@@ -90,6 +95,7 @@ public class ReportController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public String deleteReportById(@PathVariable long id) throws ReportNotFoundException {
 
         if(reportService.getReportById(id) == null)
@@ -120,6 +126,7 @@ public class ReportController {
     /* REST APIs Start from Here... */
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {
 
         if(reportDTO.getQuery().toLowerCase().contains("drop"))
@@ -178,6 +185,7 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> updateReport(@Valid @RequestBody ReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException, IllegalQueryException {
 
         if(reportService.getReportById(id) == null)
@@ -191,6 +199,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> deleteReport(@PathVariable long id) throws ReportNotFoundException {
 
         if(reportService.getReportById(id) == null)
@@ -201,6 +210,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/deleteAll")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> deleteAllReports() {
 
         return new ResponseEntity<>(reportService.deleteAllReports(), HttpStatus.OK);
