@@ -2,6 +2,7 @@ package com.imambiplob.databasereport.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,14 +34,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         else {
-            String authHeader = request.getHeader("Authorization");
+//            String authHeader = request.getHeader("Authorization");
+//            String token = null;
+//
+//            if(authHeader != null && authHeader.startsWith("Bearer ")) {
+//                token = authHeader.substring(7);
+//                username = jwtService.extractUsername(token);
+//            }
 
+            Cookie[] cookies = request.getCookies();
             String token = null;
 
-            if(authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                username = jwtService.extractUsername(token);
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("token".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        username = jwtService.extractUsername(token);
+                        break;
+                    }
+                }
             }
+
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);

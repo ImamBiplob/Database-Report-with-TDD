@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> customAccessControlHandling(AccessDeniedException exception) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Access to this Endpoint is SECURED!!!", exception.getMessage());
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "YOU ARE NOT AUTHORIZED TO PERFORM THIS OPERATION!!!", exception.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 

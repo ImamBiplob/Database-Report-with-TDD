@@ -7,8 +7,12 @@ import com.imambiplob.databasereport.dto.UserDTO;
 import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.security.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,14 +21,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 @Controller
-@RestController
+//@RestController
 @RequestMapping("api/users")
 public class UserController {
 
@@ -54,30 +58,63 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginAndRedirect(@Valid LoginRequest loginRequest) throws URISyntaxException {
+    public String loginAndRedirect(@Valid LoginRequest loginRequest, HttpServletResponse response) throws URISyntaxException {
 
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         if (authentication.isAuthenticated()) {
 
-            String token = jwtService.generateToken(loginRequest.getUsername());
+            Cookie cookie = new Cookie("token", jwtService.generateToken(loginRequest.getUsername()));
+            int maxAgeInSeconds = (int) TimeUnit.HOURS.toSeconds(24);  // Setting lifetime 24 hours for cookie
+            cookie.setMaxAge(maxAgeInSeconds);
+            cookie.setSecure(true);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/api");
+            cookie.setDomain("localhost");
+            response.addCookie(cookie);
 
-            URI uri = new URI("http://localhost:9191/");
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + token);
-
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            RestTemplate restTemplate = new RestTemplate();
-
-            return restTemplate.exchange(uri+"/api/reports/view", HttpMethod.GET, entity, String.class);
-
-        } else {
-            throw new UsernameNotFoundException("Invalid User Request!!!");
-        }
+            return "redirect:/api/reports/view";
+        } else throw new UsernameNotFoundException("Invalid User Request!!!");
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // Remove the "token" cookie by setting its max age to zero
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("token".equals(cookie.getName())) {
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/api");
+                    cookie.setDomain("localhost"); // Set the appropriate domain
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+
+        return "redirect:/api/users/login/view";
+    }
+
+//        if (authentication.isAuthenticated()) {
+//
+//            String token = jwtService.generateToken(loginRequest.getUsername());
+//
+//            URI uri = new URI("http://localhost:9191/");
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add("Authorization", "Bearer " + token);
+//
+//            HttpEntity<String> entity = new HttpEntity<>(headers);
+//
+//            RestTemplate restTemplate = new RestTemplate();
+//
+//            return restTemplate.exchange(uri+"/api/reports/view", HttpMethod.GET, entity, String.class);
+//
+//        } else {
+//            throw new UsernameNotFoundException("Invalid User Request!!!");
+//        }
 
     /* REST APIs Start from Here... */
 
