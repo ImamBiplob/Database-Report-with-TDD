@@ -73,7 +73,7 @@ public class DatabaseReportServiceTests {
                 .paramsMap(paramsMap)
                 .build();
 
-        ReportDTO addedReport = reportService.addReport(reportDTO);
+        ReportDTO addedReport = reportService.addReport(reportDTO, "admin");
 
         Assertions.assertNotNull(addedReport, "Report should be added");
         Assertions.assertEquals(reportDTO.getReportName(), addedReport.getReportName());
@@ -93,7 +93,7 @@ public class DatabaseReportServiceTests {
                 .paramsMap(paramsMap)
                 .build();
 
-        Assertions.assertThrows(ConstraintViolationException.class, () -> reportService.addReport(reportDTO));
+        Assertions.assertThrows(ConstraintViolationException.class, () -> reportService.addReport(reportDTO, "admin"));
 
     }
 
@@ -106,7 +106,7 @@ public class DatabaseReportServiceTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ReportDTO retrievedReport = reportService.getReportById(savedReport.getId());
 
@@ -152,7 +152,7 @@ public class DatabaseReportServiceTests {
 
         reportRepository.save(report);
 
-        RunResult runResult = reportService.runReport(report.getId());
+        RunResult runResult = reportService.runReport(report.getId(), "admin");
 
         Assertions.assertNotNull(runResult);          /* If report exists and sql is valid, result will not be null */
 
@@ -168,7 +168,7 @@ public class DatabaseReportServiceTests {
 
         /* If report doesn't exist, there will be null pointer exception and no history will be created */
 
-        Assertions.assertThrows(NullPointerException.class, () -> reportService.runReport(10000000L));
+        Assertions.assertThrows(NullPointerException.class, () -> reportService.runReport(10000000L, "admin"));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(10000000L).get(0));  /* No History */
 
     }
@@ -186,7 +186,7 @@ public class DatabaseReportServiceTests {
 
         /* It will throw an exception due to invalid SQL */
 
-        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.runReport(report.getId()));
+        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.runReport(report.getId(), "admin"));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
@@ -204,7 +204,7 @@ public class DatabaseReportServiceTests {
 
         /* It will throw an exception due to malformed SQL statement */
 
-        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.runReport(report.getId()));
+        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.runReport(report.getId(), "admin"));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
 
     }
@@ -224,7 +224,7 @@ public class DatabaseReportServiceTests {
 
         reportRepository.save(report);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.runReport(report.getId()));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.runReport(report.getId(), "admin"));
 
         /* Couldn't set parameter due to mismatched parameter names, hence threw an exception */
 
@@ -241,7 +241,7 @@ public class DatabaseReportServiceTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         savedReport.setReportName("All Junior Executives");
         savedReport.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
@@ -262,7 +262,7 @@ public class DatabaseReportServiceTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ReportDTO deletedReport = reportService.deleteReport(savedReport.getId());
 

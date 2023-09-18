@@ -6,6 +6,7 @@ import com.imambiplob.databasereport.dto.ReportView;
 import com.imambiplob.databasereport.dto.RunResult;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
+import com.imambiplob.databasereport.security.JwtAuthFilter;
 import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,9 +27,11 @@ import static com.imambiplob.databasereport.util.Converter.convertReportViewToRe
 public class ReportController {
 
     private final ReportService reportService;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, JwtAuthFilter jwtAuthFilter) {
         this.reportService = reportService;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @PostMapping("/saveReport")
@@ -36,7 +39,7 @@ public class ReportController {
     public String saveReport(@ModelAttribute ReportView reportView) {
 
         ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-        reportService.addReport(reportDTO);
+        reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
 
         return "redirect:/api/reports/view";
 
@@ -113,7 +116,7 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        RunResult runResult = reportService.runReport(id);
+        RunResult runResult = reportService.runReport(id, jwtAuthFilter.getCurrentUser());
 
         ModelAndView mav = new ModelAndView("list-run-result");
         mav.addObject("runResult", runResult);
@@ -132,7 +135,7 @@ public class ReportController {
         if(reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
-        return new ResponseEntity<>(reportService.addReport(reportDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser()), HttpStatus.CREATED);
 
     }
 
@@ -180,7 +183,7 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        return new ResponseEntity<>(reportService.runReport(id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.runReport(id, jwtAuthFilter.getCurrentUser()), HttpStatus.OK);
 
     }
 

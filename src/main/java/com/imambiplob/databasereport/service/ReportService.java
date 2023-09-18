@@ -55,9 +55,9 @@ public class ReportService {
     }
 
     @Transactional
-    public ReportDTO addReport(ReportDTO reportDTO) {
+    public ReportDTO addReport(ReportDTO reportDTO, String username) {
 
-        User user = userRepository.findUserByUsername("admin");
+        User user = userRepository.findUserByUsername(username);
         
         return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO, user)));
 
@@ -140,9 +140,9 @@ public class ReportService {
     }
 
     @Transactional
-    public RunResult runReport(long id) {
+    public RunResult runReport(long id, String username) {
 
-        User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
+        User user = userRepository.findUserByUsername(username);  /* Current user who is executing query */
 
         Report report = reportRepository.findReportById(id);
 
