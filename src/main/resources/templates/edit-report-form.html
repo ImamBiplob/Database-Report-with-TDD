@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -80,7 +80,7 @@
         </form>
 
         <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning me-1 mt-2 shadow">Run</a>
-        <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2 shadow">Delete</a>
+        <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2 shadow">Delete</a>
 
     </div>
 

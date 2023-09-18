@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html  lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -22,8 +22,12 @@
     <h3>List of Reports</h3>
 
     <hr/>
-    <a id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
-    <br/><br/>
+    <div class="d-flex justify-content-between align-items-center">
+        <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
+        <p><span class="fw-medium">Current User: </span><span class="fw-bold" sec:authentication="name"></span></p>
+<!--        <a th:href="@{/api/users/logout}" class="btn btn-danger shadow">Log Out</a>-->
+    </div>
+    <hr/>
 
     <table class="table table-bordered table-striped table-success table-hover shadow" id="reportTable">
 
@@ -46,11 +50,11 @@
             <td th:text="${report.lastUpdateTime}"/>
             <td th:text="${report.reportCreatorName}"/>
             <td>
-                <a th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Edit</a>
-                <a th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Edit</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')" th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
                     History</a>
                 <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
-                <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
+                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
             </td>
         </tr>
         </tbody>
