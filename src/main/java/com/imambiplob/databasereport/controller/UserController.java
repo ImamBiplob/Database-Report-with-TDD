@@ -23,8 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Controller
@@ -58,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginAndRedirect(@Valid LoginRequest loginRequest, HttpServletResponse response) throws URISyntaxException {
+    public String loginAndRedirect(@Valid @ModelAttribute LoginRequest loginRequest, HttpServletResponse response) {
 
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -66,7 +64,7 @@ public class UserController {
         if (authentication.isAuthenticated()) {
 
             Cookie cookie = new Cookie("token", jwtService.generateToken(loginRequest.getUsername()));
-            int maxAgeInSeconds = (int) TimeUnit.HOURS.toSeconds(24);  // Setting lifetime 24 hours for cookie
+            int maxAgeInSeconds = (int) TimeUnit.HOURS.toSeconds(12);  // Setting lifetime 12 hours for cookie
             cookie.setMaxAge(maxAgeInSeconds);
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
@@ -75,7 +73,9 @@ public class UserController {
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
-        } else throw new UsernameNotFoundException("Invalid User Request!!!");
+        }
+
+        else throw new UsernameNotFoundException("Invalid User Request!!!");
     }
 
     @GetMapping("/logout")

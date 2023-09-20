@@ -1,13 +1,11 @@
 package com.imambiplob.databasereport.controller;
 
-import com.imambiplob.databasereport.dto.ParamDTO;
-import com.imambiplob.databasereport.dto.ReportDTO;
-import com.imambiplob.databasereport.dto.ReportView;
-import com.imambiplob.databasereport.dto.RunResult;
+import com.imambiplob.databasereport.dto.*;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
 import com.imambiplob.databasereport.security.JwtAuthFilter;
 import com.imambiplob.databasereport.service.ReportService;
+import com.imambiplob.databasereport.service.ScheduledReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
-import static com.imambiplob.databasereport.util.Converter.convertReportDTOToReportView;
-import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
+import static com.imambiplob.databasereport.util.Converter.*;
 
 @Controller
 //@RestController
@@ -27,10 +24,12 @@ import static com.imambiplob.databasereport.util.Converter.convertReportViewToRe
 public class ReportController {
 
     private final ReportService reportService;
+    private final ScheduledReportService scheduledReportService;
     private final JwtAuthFilter jwtAuthFilter;
 
-    public ReportController(ReportService reportService, JwtAuthFilter jwtAuthFilter) {
+    public ReportController(ReportService reportService, ScheduledReportService scheduledReportService, JwtAuthFilter jwtAuthFilter) {
         this.reportService = reportService;
+        this.scheduledReportService = scheduledReportService;
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
@@ -38,8 +37,15 @@ public class ReportController {
     @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String saveReport(@ModelAttribute ReportView reportView) {
 
-        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-        reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
+        if(!reportView.isScheduled()) {
+            ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+            reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
+        }
+
+        else {
+            ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
+            scheduledReportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
+        }
 
         return "redirect:/api/reports/view";
 
@@ -49,8 +55,15 @@ public class ReportController {
     @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String updateReport(@ModelAttribute ReportView reportView) {
 
-        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-        reportService.updateReport(reportDTO, reportDTO.getId());
+        if(!reportView.isScheduled()) {
+            ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+            reportService.updateReport(reportDTO, reportDTO.getId());
+        }
+
+        else {
+            ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
+            scheduledReportService.updateReport(reportDTO, reportDTO.getId());
+        }
 
         return "redirect:/api/reports/view";
 
@@ -88,9 +101,18 @@ public class ReportController {
             throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");
 
         ModelAndView mav = new ModelAndView("edit-report-form");
-        ReportView report = convertReportDTOToReportView(reportService.getReportById(reportId));
+
+        ReportView report;
+        if(!reportService.getReportById(reportId).isScheduled()) {
+            report = convertReportDTOToReportView(reportService.getReportById(reportId));
+        }
+        else {
+            report = convertScheduledReportDTOToReportView(scheduledReportService.getReportById(reportId));
+        }
+
         if(report.getParamsList().isEmpty())
             report.setParamsList(List.of(new ParamDTO()));
+
         mav.addObject("report", report);
 
         return mav;

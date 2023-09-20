@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -158,7 +157,7 @@ public class ReportService {
 
     @Scheduled(cron = "${interval-in-cron}")
     @Transactional
-    public void runReport() throws InterruptedException, IOException {
+    public void runReport() {
 
         Report report = reportRepository.findReportById(555);
 

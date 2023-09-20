@@ -35,9 +35,9 @@ public class ReportFileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getReportFile(@PathVariable String id) {
+    public ResponseEntity<?> getReportFileDTO(@PathVariable String id) {
 
-        ReportFileDTO reportFileDTO = reportFileService.getFile(id);
+        ReportFileDTO reportFileDTO = reportFileService.getReportFileDTO(id);
 
         if(reportFileDTO != null)
             return new ResponseEntity<>(reportFileDTO, HttpStatus.OK);

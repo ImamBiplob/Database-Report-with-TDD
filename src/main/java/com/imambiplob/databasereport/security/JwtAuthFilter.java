@@ -33,28 +33,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (request.getServletPath().matches("/api/users/login|/api/users/login/view|/api/users/authenticate")) {
             filterChain.doFilter(request, response);
         }
-        else {
-//            String authHeader = request.getHeader("Authorization");
-//            String token = null;
-//
-//            if(authHeader != null && authHeader.startsWith("Bearer ")) {
-//                token = authHeader.substring(7);
-//                username = jwtService.extractUsername(token);
-//            }
 
-            Cookie[] cookies = request.getCookies();
+        else {
+            String authHeader = request.getHeader("Authorization");
             String token = null;
 
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("token".equals(cookie.getName())) {
-                        token = cookie.getValue();
-                        username = jwtService.extractUsername(token);
-                        break;
+            if(authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                username = jwtService.extractUsername(token);
+            }
+
+            else {
+                Cookie[] cookies = request.getCookies();
+
+                if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                        if ("token".equals(cookie.getName())) {
+                            token = cookie.getValue();
+                            username = jwtService.extractUsername(token);
+                            break;
+                        }
                     }
                 }
             }
-
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);

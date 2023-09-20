@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,5 +35,17 @@ public class ReportView implements Serializable {
     private Date lastUpdateTime;
 
     private String downloadLink;
+
+    private boolean scheduled = false;
+
+    private boolean daily;
+
+    private boolean weekly;
+
+    private boolean monthly;
+
+    private boolean yearly;
+
+    private LocalTime time;// = LocalTime.parse("00:00");
 
 }
