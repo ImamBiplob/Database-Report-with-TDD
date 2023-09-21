@@ -28,7 +28,7 @@
         <tr>
             <th>History ID</th>
             <th>Report ID</th>
-            <th>Report Name</th>
+            <th>Report Title</th>
             <th>Report Execution Time</th>
             <th>Report Executor Name</th>
             <th>Action</th>
@@ -50,10 +50,19 @@
     </table>
 
     <hr/>
-    <a th:href="@{/api/reports/view}">Back to Report List</a>
+<!--    <div>-->
+<!--        <button class="btn btn-secondary mb-2" onclick="goBack()">Go Back</button>-->
+<!--    </div>-->
+    <a class="me-2" th:href="@{/api/reports/view}">Back to Report List</a>
+    <a th:href="@{/api/reports/scheduled/view}">Back to Scheduled Report List</a>
 
 </div>
 
+<!--<script>-->
+<!--    function goBack() {-->
+<!--        window.history.back();-->
+<!--    }-->
+<!--</script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
 <script>

@@ -1,15 +1,16 @@
 package com.imambiplob.databasereport.service;
 
+import com.imambiplob.databasereport.dto.EmailDetails;
 import com.imambiplob.databasereport.dto.ScheduledReportDTO;
+import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.ScheduledReport;
 import com.imambiplob.databasereport.entity.User;
+import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.ScheduledReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.util.Converter;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,23 +22,39 @@ import static com.imambiplob.databasereport.util.Converter.convertScheduledRepor
 
 @Service
 public class ScheduledReportService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
-    private final ApplicationEventPublisher publisher;
-    private final ScheduledReportRepository reportRepository;
+    private final ReportRepository reportRepository;
+    private final ScheduledReportRepository scheduledReportRepository;
     private final UserRepository userRepository;
-    private final CsvExportService csvExportService;
+    private final ReportService reportService;
     private final EmailService emailService;
-    private final CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult;
 
-    public ScheduledReportService(ApplicationEventPublisher publisher, ScheduledReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
-        this.publisher = publisher;
+    public ScheduledReportService(ReportRepository reportRepository, ScheduledReportRepository scheduledReportRepository, UserRepository userRepository, ReportService reportService, EmailService emailService) {
         this.reportRepository = reportRepository;
+        this.scheduledReportRepository = scheduledReportRepository;
         this.userRepository = userRepository;
-        this.csvExportService = csvExportService;
+        this.reportService = reportService;
         this.emailService = emailService;
-        this.csvExportServiceForSingleColumnResult = csvExportServiceForSingleColumnResult;
+    }
+
+    @Scheduled(cron = "${interval-in-cron}")
+    @Transactional
+    public void runReport() {
+
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for(ScheduledReport report : reports) {
+            String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+
+            reportService.performExecution(report, filePath);
+
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setAttachment(filePath);
+            emailDetails.setSubject("Report of " + report.getReportName());
+            emailDetails.setRecipient("imamhbiplob@gmail.com");
+            emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
+            emailService.sendMailWithAttachment(emailDetails);
+        }
+
     }
 
     @Transactional
@@ -45,13 +62,13 @@ public class ScheduledReportService {
 
         User user = userRepository.findUserByUsername(username);
 
-        return convertScheduledReportToScheduledReportDTO(reportRepository.save(convertScheduledReportDTOToScheduledReport(reportDTO, user)));
+        return convertScheduledReportToScheduledReportDTO(scheduledReportRepository.save(convertScheduledReportDTOToScheduledReport(reportDTO, user)));
 
     }
 
     public List<ScheduledReportDTO> getReports() {
 
-        return reportRepository.findAll().stream()
+        return scheduledReportRepository.findAll().stream()
                 .map(Converter::convertScheduledReportToScheduledReportDTO)
                 .collect(Collectors.toList());
 
@@ -59,35 +76,46 @@ public class ScheduledReportService {
 
     public ScheduledReportDTO getReportById(long id) {
 
-        return convertScheduledReportToScheduledReportDTO(reportRepository.findScheduledReportById(id));
+        return convertScheduledReportToScheduledReportDTO(scheduledReportRepository.findScheduledReportById(id));
 
     }
 
     public ScheduledReportDTO updateReport(ScheduledReportDTO reportDTO, long id) {
 
-        ScheduledReport report = reportRepository.findScheduledReportById(id);
+        ScheduledReport scheduledReport = new ScheduledReport();
 
-        report.setReportName(reportDTO.getReportName());
-        report.setQuery(reportDTO.getQuery());
-        report.setColumns(reportDTO.getColumns());
-        report.setParamsMap(reportDTO.getParamsMap());
-        report.setLastUpdateTime(new Date());
-        report.setTime(reportDTO.getTime());
-        report.setDaily(reportDTO.isDaily());
-        report.setWeekly(reportDTO.isWeekly());
-        report.setMonthly(reportDTO.isMonthly());
-        report.setYearly(reportDTO.isYearly());
-        report.getParamsMap().remove("");
+        if(scheduledReportRepository.findScheduledReportById(id) == null) {
 
-        return convertScheduledReportToScheduledReportDTO(reportRepository.save(report));
+            Report savedReport = reportRepository.findReportById(id);
+
+            scheduledReport.setReportCreator(savedReport.getReportCreator());
+            scheduledReport.setCreationTime(savedReport.getCreationTime());
+        }
+        else {
+            scheduledReport = scheduledReportRepository.findScheduledReportById(id);
+        }
+
+        scheduledReport.setReportName(reportDTO.getReportName());
+        scheduledReport.setQuery(reportDTO.getQuery());
+        scheduledReport.setColumns(reportDTO.getColumns());
+        scheduledReport.setParamsMap(reportDTO.getParamsMap());
+        scheduledReport.setLastUpdateTime(new Date());
+        scheduledReport.setTime(reportDTO.getTime());
+        scheduledReport.setDaily(reportDTO.isDaily());
+        scheduledReport.setWeekly(reportDTO.isWeekly());
+        scheduledReport.setMonthly(reportDTO.isMonthly());
+        scheduledReport.setYearly(reportDTO.isYearly());
+        scheduledReport.getParamsMap().remove("");
+
+        return convertScheduledReportToScheduledReportDTO(scheduledReportRepository.save(scheduledReport));
 
     }
 
     public ScheduledReportDTO deleteReport(long id) {
 
-        ScheduledReportDTO reportDTO = convertScheduledReportToScheduledReportDTO(reportRepository.findScheduledReportById(id));
+        ScheduledReportDTO reportDTO = convertScheduledReportToScheduledReportDTO(scheduledReportRepository.findScheduledReportById(id));
 
-        reportRepository.deleteById(id);
+        scheduledReportRepository.deleteById(id);
 
         return reportDTO;
 

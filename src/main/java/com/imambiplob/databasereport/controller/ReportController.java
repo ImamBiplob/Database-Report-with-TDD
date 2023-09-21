@@ -74,7 +74,19 @@ public class ReportController {
 
         List<ReportDTO> reports = reportService.getReports();
         ModelAndView mav = new ModelAndView("list-reports");
-        mav.addObject("reports", reports);
+        mav.addObject("reports", reports.stream().filter(r -> !r.isScheduled()).toList());
+
+        return mav;
+
+    }
+
+    @GetMapping("/scheduled/view")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
+    public ModelAndView getScheduledReportsView() {
+
+        List<ReportDTO> reports = reportService.getReports();
+        ModelAndView mav = new ModelAndView("list-scheduled-reports");
+        mav.addObject("scheduledReports", reports.stream().filter(ReportDTO::isScheduled).toList());
 
         return mav;
 

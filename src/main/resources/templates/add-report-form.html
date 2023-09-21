@@ -26,7 +26,7 @@
         <form class="w-100" th:action="@{/api/reports/saveReport}" method="post" th:object="${report}">
 
             <div>
-                <label>Report Name:</label>
+                <label>Report Title:</label>
                 <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}" placeholder="Enter Report Name" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -42,7 +42,8 @@
     <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download</a>
 
     <hr/>
-    <a th:href="@{/api/reports/view}">Back to Report List</a>
+    <a class="me-2" th:href="@{/api/reports/view}">Back to Report List</a>
+    <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/scheduled/view}">Back to Scheduled Report List</a>
 
 </div>
 

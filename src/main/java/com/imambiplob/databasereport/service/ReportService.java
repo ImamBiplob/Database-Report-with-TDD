@@ -1,6 +1,5 @@
 package com.imambiplob.databasereport.service;
 
-import com.imambiplob.databasereport.dto.EmailDetails;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.dto.RunResult;
@@ -19,7 +18,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,15 +39,13 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
-    private final EmailService emailService;
     private final CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult;
 
-    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
         this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
-        this.emailService = emailService;
         this.csvExportServiceForSingleColumnResult = csvExportServiceForSingleColumnResult;
     }
 
@@ -152,25 +148,6 @@ public class ReportService {
         publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
 
         return runResult;
-
-    }
-
-    @Scheduled(cron = "${interval-in-cron}")
-    @Transactional
-    public void runReport() {
-
-        Report report = reportRepository.findReportById(555);
-
-        String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
-
-        performExecution(report, filePath);
-
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setAttachment(filePath);
-        emailDetails.setSubject("Report of " + report.getReportName());
-        emailDetails.setRecipient("imamhbiplob@gmail.com");
-        emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
-        emailService.sendMailWithAttachment(emailDetails);
 
     }
 
