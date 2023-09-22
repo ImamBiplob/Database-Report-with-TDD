@@ -27,44 +27,47 @@
 
             <div>
                 <label>Report Title:</label>
-                <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}" placeholder="Enter Report Name" required="required"/>
+                <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}"
+                       placeholder="Enter Report Name" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
             <div>
                 <label>SQL Query:</label>
-                <textarea class="form-control w-100 mb-4" th:field="*{query}" placeholder="Enter SQL Query" required="required"></textarea>
+                <textarea class="form-control w-100 mb-4" th:field="*{query}" placeholder="Enter SQL Query"
+                          required="required"></textarea>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
             <div>
                 <label>Columns:</label>
-                <input class="form-control w-100 mb-4" type="text" th:field="*{columns}" placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
+                <input class="form-control w-100 mb-4" type="text" th:field="*{columns}"
+                       placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
             <label for="scheduled">Scheduled:</label>
-            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()" />
+            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()"/>
 
             <div class="mb-2" id="dailyField" style="display: none;">
                 <label for="daily">Daily:</label>
-                <input type="checkbox" id="daily" th:field="*{daily}" />
+                <input type="checkbox" id="daily" th:field="*{daily}"/>
             </div>
             <div class="mb-2" id="weeklyField" style="display: none;">
                 <label for="weekly">Weekly:</label>
-                <input type="checkbox" id="weekly" th:field="*{daily}" />
+                <input type="checkbox" id="weekly" th:field="*{daily}"/>
             </div>
             <div class="mb-2" id="monthlyField" style="display: none;">
                 <label for="monthly">Monthly:</label>
-                <input type="checkbox" id="monthly" th:field="*{daily}" />
+                <input type="checkbox" id="monthly" th:field="*{daily}"/>
             </div>
             <div class="mb-2" id="yearlyField" style="display: none;">
                 <label for="yearly">Yearly:</label>
-                <input type="checkbox" id="yearly" th:field="*{daily}" />
+                <input type="checkbox" id="yearly" th:field="*{daily}"/>
             </div>
             <div class="mb-4" id="timeField" style="display: none;">
                 <label for="time">Time:</label>
-                <input type="text" id="time" th:field="*{time}" placeholder="HH:mm" />
+                <input type="text" id="time" th:field="*{time}" placeholder="HH:mm"/>
             </div>
 
             <div id="params-container">
@@ -72,17 +75,23 @@
                 <div class="param-row" th:each="paramItem, paramIndex : *{paramsList}">
 
                     <label>Parameter Name:</label>
-                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramName}" class="my-1" placeholder="Enter Parameter Name">
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramName}" class="my-1"
+                           placeholder="Enter Parameter Name">
 
                     <label>Parameter Value:</label>
-                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1" placeholder="Enter Parameter Value">
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1"
+                           placeholder="Enter Parameter Value">
 
-                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1 shadow" onclick="removeParamRow(this)">Remove</button>
+                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1 shadow"
+                            onclick="removeParamRow(this)">Remove
+                    </button>
 
                 </div>
             </div>
 
-            <button type="button" class="btn btn-secondary btn-sm my-1 shadow" style="width: 120px; height: 35px;" onclick="addParamRow()">Add Parameter</button>
+            <button type="button" class="btn btn-secondary btn-sm my-1 shadow" style="width: 120px; height: 35px;"
+                    onclick="addParamRow()">Add Parameter
+            </button>
 
             <hr/>
 
@@ -97,10 +106,18 @@
     </div>
 
     <hr/>
-    <a th:href="@{/api/reports/view}">Back to Report List</a>
+    <div>
+        <button class="btn btn-sm btn-outline-primary mb-2" onclick="goBack()">Go Back</button>
+    </div>
+<!--    <a th:href="@{/api/reports/view}">Back to Report List</a>-->
 
 </div>
 
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 <script type="text/javascript">
     function toggleFields() {
 

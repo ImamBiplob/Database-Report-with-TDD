@@ -65,7 +65,7 @@ public class ReportController {
             scheduledReportService.updateReport(reportDTO, reportDTO.getId());
         }
 
-        return "redirect:/api/reports/view";
+        return "redirect:/api/reports/view/editReportForm/" + reportView.getId();
 
     }
 
@@ -105,9 +105,9 @@ public class ReportController {
 
     }
 
-    @GetMapping("/view/editReportForm")
+    @GetMapping("/view/editReportForm/{reportId}")
     @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
-    public ModelAndView editReportForm(@RequestParam long reportId) throws ReportNotFoundException {
+    public ModelAndView editReportForm(@PathVariable long reportId) throws ReportNotFoundException {
 
         if(reportService.getReportById(reportId) == null)
             throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");

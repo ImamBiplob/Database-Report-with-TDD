@@ -52,7 +52,7 @@
             <td th:text="${report.reportCreatorName}"/>
             <td th:text="${report.scheduled}"/>
             <td>
-                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm(reportId=${report.id})}" class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}" class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
                 <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')" th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
                     History</a>
                 <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
