@@ -13,24 +13,26 @@
 
 <body th:object="${loginRequest}">
 
-<div class="container my-5">
+<div class="container d-flex justify-content-center my-5">
 
-    <h3>Login</h3>
-    <hr/>
+    <div class="w-25">
+        <h3>Login</h3>
+        <hr/>
 
-    <form id="loginForm" th:action="@{/api/users/login}" method="post">
+        <form id="loginForm" th:action="@{/api/users/login}" method="post">
 
-        <label for="username">Username:</label>
-        <input class="form-control w-100 mb-4" type="text" th:field="*{username}" id="username" name="username"
-               required/>
+            <label for="username">Username:</label>
+            <input class="form-control w-100 mb-4" type="text" th:field="*{username}" id="username" name="username"
+                   required/>
 
-        <label for="password">Password:</label>
-        <input class="form-control w-100 mb-4" type="password" th:field="*{password}" id="password" name="password"
-               required/>
+            <label for="password">Password:</label>
+            <input class="form-control w-100 mb-4" type="password" th:field="*{password}" id="password" name="password"
+                   required/>
 
-        <button id="loginButton" class="btn btn-primary shadow-lg" style="width: 100px;" type="submit">Login</button>
+            <button id="loginButton" class="btn btn-primary shadow-lg" style="width: 100px;" type="submit">Login</button>
 
-    </form>
+        </form>
+    </div>
 
 </div>
 

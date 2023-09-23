@@ -26,11 +26,11 @@
 
         <thead>
         <tr>
-            <th>History ID</th>
+            <th>ID</th>
             <th>Report ID</th>
             <th>Report Title</th>
-            <th>Report Execution Time</th>
             <th>Report Executor Name</th>
+            <th>Report Execution Time</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -40,8 +40,8 @@
             <td th:text="${h.id}"/>
             <td th:text="${h.reportId}"/>
             <td th:text="${h.reportName}"/>
-            <td th:text="${h.executionTime}"/>
             <td th:text="${h.reportExecutorName}"/>
+            <td th:text="${h.executionTime}"/>
             <td><a th:href="@{/api/histories/view/details(id=${h.id})}" class="btn btn-info m-1 shadow">History Details</a>
             </td>
         </tr>

@@ -19,12 +19,15 @@
 
 <div class="container-100 m-5 px-5">
 
-    <h3>List of Scheduled Reports</h3>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>List of Reports</h3>
+        <a th:href="@{/api/users/logout}" class="btn btn-outline-dark shadow">Log Out</a>
+    </div>
 
     <hr/>
     <div class="d-flex justify-content-between align-items-center">
         <a id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
-        <p><span class="fw-medium">Current User: </span><span class="fw-bold" sec:authentication="name"></span></p>
+        <p><span class="fw-medium">Current User: </span><span class="fw-bold" sec:authentication="name"></span> as <span class="fw-bold" sec:authentication="authorities"></span></p>
         <a th:href="@{/api/reports/view}" class="btn btn-outline-primary shadow">Back to List of Reports</a>
     </div>
     <hr/>
@@ -33,12 +36,11 @@
 
         <thead>
         <tr>
-            <th>Report ID</th>
-            <th>Report Title</th>
-            <th>Report Creation Time</th>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Creator Name</th>
+            <th>Creation Time</th>
             <th>Last Update Time</th>
-            <th>Report Creator Name</th>
-            <th>Scheduled</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -47,16 +49,15 @@
         <tr th:each="report: ${scheduledReports}">
             <td th:text="${report.id}"/>
             <td th:text="${report.reportName}"/>
+            <td th:text="${report.reportCreatorName}"/>
             <td th:text="${report.creationTime}"/>
             <td th:text="${report.lastUpdateTime}"/>
-            <td th:text="${report.reportCreatorName}"/>
-            <td th:text="${report.scheduled}"/>
             <td>
+                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
                 <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}" class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
+                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
                 <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')" th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
                     History</a>
-                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
-                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
             </td>
         </tr>
         </tbody>
@@ -64,7 +65,7 @@
     </table>
 
     <hr/>
-    <a th:href="@{/api/users/logout}" class="btn btn-dark my-1 shadow">Log Out</a>
+    <a href="#" class="btn btn-sm btn-outline-secondary shadow mb-2">Go Top 🔝</a>
 
 </div>
 
