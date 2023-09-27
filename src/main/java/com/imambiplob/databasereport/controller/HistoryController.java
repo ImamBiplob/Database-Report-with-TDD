@@ -22,7 +22,7 @@ public class HistoryController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     public ResponseEntity<?> getReportExecutionHistories() {
 
         return new ResponseEntity<>(historyService.getHistories(), HttpStatus.OK);
@@ -30,7 +30,7 @@ public class HistoryController {
     }
 
     @GetMapping("/sort/{field}")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     private List<HistoryDTO> getHistoriesWithSorting(@PathVariable String field) {
 
         return historyService.findHistoriesWithSorting(field);
@@ -38,7 +38,7 @@ public class HistoryController {
     }
 
     @GetMapping("/pagination/{offset}/{pageSize}")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     private List<HistoryDTO> getHistoriesWithPagination(@PathVariable int offset, @PathVariable int pageSize) {
 
         return historyService.findHistoriesWithPagination(offset, pageSize);
@@ -46,7 +46,7 @@ public class HistoryController {
     }
 
     @GetMapping("/paginationAndSort/{offset}/{pageSize}/{field}")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     private List<HistoryDTO> getHistoriesWithPaginationAndSorting(@PathVariable int offset, @PathVariable int pageSize, @PathVariable String field) {
 
         return historyService.findHistoriesWithPaginationAndSorting(offset, pageSize, field);
@@ -54,7 +54,7 @@ public class HistoryController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     public ResponseEntity<?> getReportExecutionHistoryWithId(@PathVariable long id) {
 
         HistoryDTO historyDTO = historyService.getHistory(id);
@@ -67,7 +67,7 @@ public class HistoryController {
     }
 
     @GetMapping("/ofReport/{reportId}")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     public ResponseEntity<?> getReportExecutionHistoryOfSpecificReport(@PathVariable long reportId) {
 
         return new ResponseEntity<>(historyService.getHistoryOfReport(reportId), HttpStatus.OK);
@@ -77,7 +77,7 @@ public class HistoryController {
     /* Thymeleaf APIs start from here */
 
     @GetMapping("/view")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     public ModelAndView getHistoryView(@RequestParam long reportId) {
 
         List<HistoryDTO> history = historyService.getHistoryOfReport(reportId);
@@ -89,7 +89,7 @@ public class HistoryController {
     }
 
     @GetMapping("/view/details")
-    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','ADMIN')")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT')")
     public ModelAndView getHistoryDetails(@RequestParam long id) {
 
         HistoryDTO history = historyService.getHistory(id);
