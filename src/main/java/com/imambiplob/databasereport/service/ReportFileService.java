@@ -77,7 +77,7 @@ public class ReportFileService {
 
     }
 
-    public ReportFileDTO getFile(String id) {
+    public ReportFileDTO getReportFileDTO(String id) {
 
         if(reportFileRepository.findById(id).isPresent())
             return convertReportFileToReportFileDTO(reportFileRepository.findById(id).get());

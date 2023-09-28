@@ -1,23 +1,22 @@
 package com.imambiplob.databasereport.controller;
 
-import com.imambiplob.databasereport.dto.ParamDTO;
-import com.imambiplob.databasereport.dto.ReportDTO;
-import com.imambiplob.databasereport.dto.ReportView;
-import com.imambiplob.databasereport.dto.RunResult;
+import com.imambiplob.databasereport.dto.*;
 import com.imambiplob.databasereport.exception.IllegalQueryException;
 import com.imambiplob.databasereport.exception.ReportNotFoundException;
+import com.imambiplob.databasereport.security.JwtAuthFilter;
 import com.imambiplob.databasereport.service.ReportService;
+import com.imambiplob.databasereport.service.ScheduledReportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
-import static com.imambiplob.databasereport.util.Converter.convertReportDTOToReportView;
-import static com.imambiplob.databasereport.util.Converter.convertReportViewToReportDTO;
+import static com.imambiplob.databasereport.util.Converter.*;
 
 @Controller
 //@RestController
@@ -25,28 +24,48 @@ import static com.imambiplob.databasereport.util.Converter.convertReportViewToRe
 public class ReportController {
 
     private final ReportService reportService;
+    private final ScheduledReportService scheduledReportService;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, ScheduledReportService scheduledReportService, JwtAuthFilter jwtAuthFilter) {
         this.reportService = reportService;
+        this.scheduledReportService = scheduledReportService;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @PostMapping("/saveReport")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String saveReport(@ModelAttribute ReportView reportView) {
 
-        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-        reportService.addReport(reportDTO);
+        if(!reportView.isScheduled()) {
+            ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+            reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
+        }
+
+        else {
+            ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
+            scheduledReportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser());
+        }
 
         return "redirect:/api/reports/view";
 
     }
 
     @PostMapping("/updateReport")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public String updateReport(@ModelAttribute ReportView reportView) {
 
-        ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-        reportService.updateReport(reportDTO, reportDTO.getId());
+        if(!reportView.isScheduled()) {
+            ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+            reportService.updateReport(reportDTO, reportDTO.getId());
+        }
 
-        return "redirect:/api/reports/view";
+        else {
+            ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
+            scheduledReportService.updateReport(reportDTO, reportDTO.getId());
+        }
+
+        return "redirect:/api/reports/view/editReportForm/" + reportView.getId();
 
     }
 
@@ -55,13 +74,26 @@ public class ReportController {
 
         List<ReportDTO> reports = reportService.getReports();
         ModelAndView mav = new ModelAndView("list-reports");
-        mav.addObject("reports", reports);
+        mav.addObject("reports", reports.stream().filter(r -> !r.isScheduled()).toList());
+
+        return mav;
+
+    }
+
+    @GetMapping("/scheduled/view")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
+    public ModelAndView getScheduledReportsView() {
+
+        List<ReportDTO> reports = reportService.getReports();
+        ModelAndView mav = new ModelAndView("list-scheduled-reports");
+        mav.addObject("scheduledReports", reports.stream().filter(ReportDTO::isScheduled).toList());
 
         return mav;
 
     }
 
     @GetMapping("/view/addReportForm")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ModelAndView addReportForm() {
 
         ModelAndView mav = new ModelAndView("add-report-form");
@@ -73,16 +105,26 @@ public class ReportController {
 
     }
 
-    @GetMapping("/view/editReportForm")
-    public ModelAndView editReportForm(@RequestParam long reportId) throws ReportNotFoundException {
+    @GetMapping("/view/editReportForm/{reportId}")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
+    public ModelAndView editReportForm(@PathVariable long reportId) throws ReportNotFoundException {
 
         if(reportService.getReportById(reportId) == null)
             throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");
 
         ModelAndView mav = new ModelAndView("edit-report-form");
-        ReportView report = convertReportDTOToReportView(reportService.getReportById(reportId));
+
+        ReportView report;
+        if(!reportService.getReportById(reportId).isScheduled()) {
+            report = convertReportDTOToReportView(reportService.getReportById(reportId));
+        }
+        else {
+            report = convertScheduledReportDTOToReportView(scheduledReportService.getReportById(reportId));
+        }
+
         if(report.getParamsList().isEmpty())
             report.setParamsList(List.of(new ParamDTO()));
+
         mav.addObject("report", report);
 
         return mav;
@@ -90,6 +132,7 @@ public class ReportController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public String deleteReportById(@PathVariable long id) throws ReportNotFoundException {
 
         if(reportService.getReportById(id) == null)
@@ -107,7 +150,7 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        RunResult runResult = reportService.runReport(id);
+        RunResult runResult = reportService.runReport(id, jwtAuthFilter.getCurrentUser());
 
         ModelAndView mav = new ModelAndView("list-run-result");
         mav.addObject("runResult", runResult);
@@ -120,12 +163,13 @@ public class ReportController {
     /* REST APIs Start from Here... */
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> addReport(@Valid @RequestBody ReportDTO reportDTO) throws IllegalQueryException {
 
         if(reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
-        return new ResponseEntity<>(reportService.addReport(reportDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser()), HttpStatus.CREATED);
 
     }
 
@@ -173,11 +217,12 @@ public class ReportController {
         if(reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        return new ResponseEntity<>(reportService.runReport(id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.runReport(id, jwtAuthFilter.getCurrentUser()), HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> updateReport(@Valid @RequestBody ReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException, IllegalQueryException {
 
         if(reportService.getReportById(id) == null)
@@ -191,6 +236,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> deleteReport(@PathVariable long id) throws ReportNotFoundException {
 
         if(reportService.getReportById(id) == null)
@@ -201,6 +247,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/deleteAll")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> deleteAllReports() {
 
         return new ResponseEntity<>(reportService.deleteAllReports(), HttpStatus.OK);

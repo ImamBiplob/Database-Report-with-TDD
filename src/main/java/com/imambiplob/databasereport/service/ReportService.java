@@ -1,6 +1,5 @@
 package com.imambiplob.databasereport.service;
 
-import com.imambiplob.databasereport.dto.EmailDetails;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.ResponseMessage;
 import com.imambiplob.databasereport.dto.RunResult;
@@ -19,12 +18,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -42,22 +39,20 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
-    private final EmailService emailService;
     private final CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult;
 
-    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, EmailService emailService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
         this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
-        this.emailService = emailService;
         this.csvExportServiceForSingleColumnResult = csvExportServiceForSingleColumnResult;
     }
 
     @Transactional
-    public ReportDTO addReport(ReportDTO reportDTO) {
+    public ReportDTO addReport(ReportDTO reportDTO, String username) {
 
-        User user = userRepository.findUserByUsername("admin");
+        User user = userRepository.findUserByUsername(username);
         
         return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO, user)));
 
@@ -140,9 +135,9 @@ public class ReportService {
     }
 
     @Transactional
-    public RunResult runReport(long id) {
+    public RunResult runReport(long id, String username) {
 
-        User user = userRepository.findUserByUsername("admin");  /* Current user who is executing query */
+        User user = userRepository.findUserByUsername(username);  /* Current user who is executing query */
 
         Report report = reportRepository.findReportById(id);
 
@@ -153,25 +148,6 @@ public class ReportService {
         publisher.publishEvent(new ReportExecutionEventForHistory(this, user, report));
 
         return runResult;
-
-    }
-
-    @Scheduled(cron = "${interval-in-cron}")
-    @Transactional
-    public void runReport() throws InterruptedException, IOException {
-
-        Report report = reportRepository.findReportById(555);
-
-        String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
-
-        performExecution(report, filePath);
-
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setAttachment(filePath);
-        emailDetails.setSubject("Report of " + report.getReportName());
-        emailDetails.setRecipient("imamhbiplob@gmail.com");
-        emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
-        emailService.sendMailWithAttachment(emailDetails);
 
     }
 

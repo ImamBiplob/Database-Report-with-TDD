@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -26,7 +26,7 @@
         <form class="w-100" th:action="@{/api/reports/updateReport}" method="post" th:object="${report}">
 
             <div>
-                <label>Report Name:</label>
+                <label>Report Title:</label>
                 <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}"
                        placeholder="Enter Report Name" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
@@ -44,6 +44,32 @@
                 <input class="form-control w-100 mb-4" type="text" th:field="*{columns}"
                        placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
+            </div>
+
+            <label for="scheduled">Scheduled:</label>
+            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()" />
+            <a class="btn btn-secondary btn-sm mb-2 ms-2" th:if="${report.scheduled != false}" onclick="showFields()">Expand</a>
+
+            <div class="mb-2" id="dailyField" style="display: none;">
+                <label for="daily">Daily:</label>
+                <input type="checkbox" id="daily" th:field="*{daily}" />
+            </div>
+            <div class="mb-2" id="weeklyField" style="display: none;">
+                <label for="weekly">Weekly:</label>
+                <input type="checkbox" id="weekly" th:field="*{weekly}" />
+            </div>
+            <div class="mb-2" id="monthlyField" style="display: none;">
+                <label for="monthly">Monthly:</label>
+                <input type="checkbox" id="monthly" th:field="*{monthly}" />
+            </div>
+            <div class="mb-2" id="yearlyField" style="display: none;">
+                <label for="yearly">Yearly:</label>
+                <input type="checkbox" id="yearly" th:field="*{yearly}" />
+            </div>
+<!--            th:if="${report.scheduled != false}"-->
+            <div class="mb-4" id="timeField" style="display: none;">
+                <label for="time">Time:</label>
+                <input type="text" id="time" th:field="*{time}" placeholder="HH:mm" />
             </div>
 
             <div id="params-container">
@@ -80,15 +106,56 @@
         </form>
 
         <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning me-1 mt-2 shadow">Run</a>
-        <a th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2 shadow">Delete</a>
+        <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2 shadow">Delete</a>
 
     </div>
 
     <hr/>
-    <a th:href="@{/api/reports/view}">Back to Report List</a>
+    <a th:if="${report.scheduled == false}" th:href="@{/api/reports/view}">Back to Report List</a>
+    <a th:if="${report.scheduled != false}" th:href="@{/api/reports/scheduled/view}">Back to Scheduled Report List</a>
 
 </div>
 
+<script type="text/javascript">
+    function toggleFields() {
+
+        const scheduledCheckbox = document.getElementById("scheduled");
+        const dailyField = document.getElementById("dailyField");
+        const weeklyField = document.getElementById("weeklyField");
+        const monthlyField = document.getElementById("monthlyField");
+        const yearlyField = document.getElementById("yearlyField");
+        const timeField = document.getElementById("timeField");
+
+        if (scheduledCheckbox.checked) {
+            dailyField.style.display = "block";
+            weeklyField.style.display = "block";
+            monthlyField.style.display = "block";
+            yearlyField.style.display = "block";
+            timeField.style.display = "block";
+        } else {
+            dailyField.style.display = "none";
+            weeklyField.style.display = "none";
+            monthlyField.style.display = "none";
+            yearlyField.style.display = "none";
+            timeField.style.display = "none";
+        }
+
+    }
+
+    function showFields() {
+        const dailyField = document.getElementById("dailyField");
+        const weeklyField = document.getElementById("weeklyField");
+        const monthlyField = document.getElementById("monthlyField");
+        const yearlyField = document.getElementById("yearlyField");
+        const timeField = document.getElementById("timeField");
+
+        dailyField.style.display = "block";
+        weeklyField.style.display = "block";
+        monthlyField.style.display = "block";
+        yearlyField.style.display = "block";
+        timeField.style.display = "block";
+    }
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     // JavaScript function to add a new ParamDTO input row

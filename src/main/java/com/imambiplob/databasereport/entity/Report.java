@@ -54,4 +54,6 @@ public class Report {
 
     private String downloadLink;
 
+    private boolean scheduled = false;
+
 }

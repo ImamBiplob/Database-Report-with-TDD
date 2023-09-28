@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -42,10 +42,19 @@
     <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download</a>
 
     <hr/>
-    <a th:href="@{/api/reports/view}">Back to Report List</a>
+    <div>
+        <button class="btn btn-sm btn-outline-secondary mb-2" onclick="goBack()">Go Back 🔙</button>
+    </div>
+<!--    <a class="me-2" th:href="@{/api/reports/view}">Back to Report List</a>-->
+<!--    <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/scheduled/view}">Back to Scheduled Report List</a>-->
 
 </div>
 
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
 <script>

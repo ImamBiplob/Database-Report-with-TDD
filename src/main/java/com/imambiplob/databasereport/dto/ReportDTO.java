@@ -37,4 +37,6 @@ public class ReportDTO implements Serializable {
 
     private String downloadLink;
 
+    private boolean scheduled = false;
+
 }

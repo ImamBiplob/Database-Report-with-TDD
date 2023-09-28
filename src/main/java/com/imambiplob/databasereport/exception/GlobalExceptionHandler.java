@@ -2,8 +2,12 @@ package com.imambiplob.databasereport.exception;
 
 import org.hibernate.exception.GenericJDBCException;
 import org.hibernate.exception.SQLGrammarException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,6 +29,42 @@ public class GlobalExceptionHandler {
                 Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 
+    }
+
+    /**
+     * Handling bad credentials exception
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> customBadCredentialsExceptionHandling(BadCredentialsException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Email or Password is INCORRECT!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handling access control exception
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> customAccessControlHandling(AccessDeniedException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "YOU ARE NOT AUTHORIZED TO PERFORM THIS OPERATION!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Handling username not found exception
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<?> customUsernameNotFoundExceptionHandling(UsernameNotFoundException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "User Not Found!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handling data integrity violation exception
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> customDataIntegrityViolationExceptionHandling(DataIntegrityViolationException exception) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Invalid Input!!! Violating Column Specification!!!", exception.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     /**

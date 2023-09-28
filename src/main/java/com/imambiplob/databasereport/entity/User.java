@@ -16,9 +16,12 @@ import java.util.List;
 @Builder
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    private String name;
 
     @Column(unique = true)
     @NotBlank(message = "Username must not be blank")
@@ -34,10 +37,16 @@ public class User {
 
     private String phone;
 
+    @NotBlank(message = "Role must not be blank")
+    private String roles;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
     private List<ReportExecutionHistory> executionHistoryList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
     private List<Report> reportList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
+    private List<ScheduledReport> scheduledReportList;
 
 }

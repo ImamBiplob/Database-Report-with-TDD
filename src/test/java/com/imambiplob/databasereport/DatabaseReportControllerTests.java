@@ -145,7 +145,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportService.addReport(report1);
+        reportService.addReport(report1, "admin");
 
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
@@ -156,7 +156,7 @@ public class DatabaseReportControllerTests {
                 .paramsMap(paramsMap)
                 .build();
 
-        reportService.addReport(report2);
+        reportService.addReport(report2, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports"));
 
@@ -175,7 +175,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/{id}", savedReport.getId()));
 
@@ -207,7 +207,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,gender,hire_date")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", savedReport.getId()));
 
@@ -242,7 +242,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", savedReport.getId()));
 
@@ -264,7 +264,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", savedReport.getId()));
 
@@ -286,7 +286,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name,job_title,salary")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", savedReport.getId()));
 
@@ -312,7 +312,7 @@ public class DatabaseReportControllerTests {
                 .paramsMap(paramsMap)
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(get("/api/reports/run/{id}", savedReport.getId()));
 
@@ -334,7 +334,7 @@ public class DatabaseReportControllerTests {
                 .columns("first_name")
                 .build();
 
-        ReportDTO savedReport = reportService.addReport(report);
+        ReportDTO savedReport = reportService.addReport(report, "admin");
 
         ReportDTO updatedReport = ReportDTO.builder()
                 .reportName("All Male Employees")
@@ -367,7 +367,7 @@ public class DatabaseReportControllerTests {
                 .paramsMap(paramsMap)
                 .build();
 
-        ReportDTO toBeDeleted = reportService.addReport(report);
+        ReportDTO toBeDeleted = reportService.addReport(report, "admin");
 
         ResultActions response = mockMvc.perform(delete("/api/reports/{id}", toBeDeleted.getId()));
 
