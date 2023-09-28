@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
-import com.imambiplob.databasereport.repository.HistoryRepository;
+import com.imambiplob.databasereport.repository.ExecutionHistoryRepository;
 import com.imambiplob.databasereport.repository.ReportFileRepository;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
@@ -48,7 +48,7 @@ public class DatabaseReportControllerTests {
     private UserRepository userRepository;
 
     @Autowired
-    private HistoryRepository historyRepository;
+    private ExecutionHistoryRepository executionHistoryRepository;
 
     @Autowired
     private ReportFileRepository reportFileRepository;
@@ -56,7 +56,7 @@ public class DatabaseReportControllerTests {
     @BeforeEach
     void setup() {
 
-        historyRepository.deleteAll();
+        executionHistoryRepository.deleteAll();
         reportFileRepository.deleteAll();
         reportRepository.deleteAll();
         userRepository.deleteAll();
@@ -215,7 +215,7 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print());
 
-        Assertions.assertEquals("All Employees", historyRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0).getReportName());
+        Assertions.assertEquals("All Employees", executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0).getReportName());
 
     }
 
@@ -229,7 +229,7 @@ public class DatabaseReportControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print());
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(1010000L).get(0));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(1010000L).get(0));
 
     }
 
@@ -251,7 +251,7 @@ public class DatabaseReportControllerTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Invalid SQL!!! Edit Report with Valid SQL and Try Again")));
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
 
     }
 
@@ -273,7 +273,7 @@ public class DatabaseReportControllerTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Invalid SQL!!! Edit Report with Valid SQL and Try Again")));
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
 
     }
 
@@ -295,7 +295,7 @@ public class DatabaseReportControllerTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Malformed SQL Statement!!! Edit Report with Correct SQL Statement and Try Again")));
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
 
     }
 
@@ -321,7 +321,7 @@ public class DatabaseReportControllerTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("Parameter Error!!! Edit Report with Valid Parameter Name and Value Before Trying Again")));
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> historyRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(savedReport.getId()).get(0));
 
     }
 

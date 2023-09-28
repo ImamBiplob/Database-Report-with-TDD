@@ -46,6 +46,6 @@ public class ReportView implements Serializable {
 
     private boolean yearly;
 
-    private LocalTime time;// = LocalTime.parse("00:00");
+    private LocalTime time;
 
 }

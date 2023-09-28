@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HistoryDTO implements Serializable {
+public class ExecutionHistoryDTO implements Serializable {
 
     private long id;
 

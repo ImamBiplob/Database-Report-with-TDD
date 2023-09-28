@@ -64,7 +64,7 @@ public class UserController {
         if (authentication.isAuthenticated()) {
 
             Cookie cookie = new Cookie("token", jwtService.generateToken(loginRequest.getUsername()));
-            int maxAgeInSeconds = (int) TimeUnit.HOURS.toSeconds(12);  // Setting lifetime 12 hours for cookie
+            int maxAgeInSeconds = (int) TimeUnit.MINUTES.toSeconds(10);
             cookie.setMaxAge(maxAgeInSeconds);
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
@@ -80,14 +80,14 @@ public class UserController {
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        // Remove the "token" cookie by setting its max age to zero
+
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("token".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/api");
-                    cookie.setDomain("localhost"); // Set the appropriate domain
+                    cookie.setDomain("localhost");
                     response.addCookie(cookie);
                     break;
                 }
@@ -96,25 +96,6 @@ public class UserController {
 
         return "redirect:/api/users/login/view";
     }
-
-//        if (authentication.isAuthenticated()) {
-//
-//            String token = jwtService.generateToken(loginRequest.getUsername());
-//
-//            URI uri = new URI("http://localhost:9191/");
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.add("Authorization", "Bearer " + token);
-//
-//            HttpEntity<String> entity = new HttpEntity<>(headers);
-//
-//            RestTemplate restTemplate = new RestTemplate();
-//
-//            return restTemplate.exchange(uri+"/api/reports/view", HttpMethod.GET, entity, String.class);
-//
-//        } else {
-//            throw new UsernameNotFoundException("Invalid User Request!!!");
-//        }
 
     /* REST APIs Start from Here... */
 

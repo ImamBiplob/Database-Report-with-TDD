@@ -230,21 +230,21 @@ public class Converter {
 
     }
 
-    public static HistoryDTO convertHistoryToHistoryDTO(ReportExecutionHistory history) {
+    public static ExecutionHistoryDTO convertHistoryToHistoryDTO(ReportExecutionHistory history) {
 
         if(history == null)
             return null;
 
-        HistoryDTO historyDTO = new HistoryDTO();
-        historyDTO.setId(history.getId());
-        historyDTO.setReportId(history.getReport().getId());
-        historyDTO.setReportName(history.getReportName());
-        historyDTO.setReportExecutorName(history.getReportExecutor().getUsername());
-        historyDTO.setSqlQuery(history.getSqlQuery());
-        historyDTO.setParamsMap(history.getParamsMap());
-        historyDTO.setExecutionTime(history.getExecutionTime());
+        ExecutionHistoryDTO executionHistoryDTO = new ExecutionHistoryDTO();
+        executionHistoryDTO.setId(history.getId());
+        executionHistoryDTO.setReportId(history.getReport().getId());
+        executionHistoryDTO.setReportName(history.getReportName());
+        executionHistoryDTO.setReportExecutorName(history.getReportExecutor().getUsername());
+        executionHistoryDTO.setSqlQuery(history.getSqlQuery());
+        executionHistoryDTO.setParamsMap(history.getParamsMap());
+        executionHistoryDTO.setExecutionTime(history.getExecutionTime());
 
-        return historyDTO;
+        return executionHistoryDTO;
 
     }
 
