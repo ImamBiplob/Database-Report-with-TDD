@@ -248,6 +248,26 @@ public class Converter {
 
     }
 
+    public static UpdateHistoryDTO convertUpdateHistoryToUpdateHistoryDTO(ReportUpdateHistory history) {
+
+        UpdateHistoryDTO historyDTO = new UpdateHistoryDTO();
+        historyDTO.setId(history.getId());
+        historyDTO.setReportId(history.getReport().getId());
+        historyDTO.setUpdatedAt(history.getUpdatedAt());
+        historyDTO.setUpdatedBy(history.getUpdatedBy().getUsername());
+        historyDTO.setPreviousReportName(history.getPreviousReportName());
+        historyDTO.setUpdatedReportName(history.getUpdatedReportName());
+        historyDTO.setPreviousSqlQuery(history.getPreviousSqlQuery());
+        historyDTO.setUpdatedSqlQuery(history.getUpdatedSqlQuery());
+        historyDTO.setPreviousScheduledStatus(history.isPreviousScheduledStatus());
+        historyDTO.setUpdatedScheduledStatus(history.isUpdatedScheduledStatus());
+        historyDTO.setPreviousParamsMap(history.getPreviousParamsMap());
+        historyDTO.setUpdatedParamsMap(history.getUpdatedParamsMap());
+
+        return historyDTO;
+
+    }
+
     public static ReportFileDTO convertReportFileToReportFileDTO(ReportFile reportFile) {
 
         String fileDownloadUri = reportFile.getReport().getDownloadLink();

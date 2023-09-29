@@ -33,6 +33,10 @@ public class ReportUpdateHistory {
 
     private String updatedSqlQuery;
 
+    private boolean previousScheduledStatus;
+
+    private boolean updatedScheduledStatus;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "update_history_previous_paramsMapping",
             joinColumns = {@JoinColumn(name = "history_id", referencedColumnName = "id")})

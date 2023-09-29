@@ -246,7 +246,7 @@ public class DatabaseReportServiceTests {
         savedReport.setReportName("All Junior Executives");
         savedReport.setQuery("select first_name, job_title, salary from employees where job_title = \"Junior Executive\"");
 
-        ReportDTO updatedReport = reportService.updateReport(savedReport, savedReport.getId());
+        ReportDTO updatedReport = reportService.updateReport(savedReport, savedReport.getId(), "admin");
 
         Assertions.assertEquals(savedReport.getId(), updatedReport.getId());
         Assertions.assertEquals("All Junior Executives", updatedReport.getReportName());

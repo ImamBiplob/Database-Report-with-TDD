@@ -7,6 +7,7 @@ import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.event.ReportExecutionEventForFile;
 import com.imambiplob.databasereport.event.ReportExecutionEventForHistory;
+import com.imambiplob.databasereport.event.ReportUpdateEventForHistory;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.util.Converter;
@@ -53,7 +54,7 @@ public class ReportService {
     public ReportDTO addReport(ReportDTO reportDTO, String username) {
 
         User user = userRepository.findUserByUsername(username);
-        
+
         return convertReportToReportDTO(reportRepository.save(convertReportDTOToReport(reportDTO, user)));
 
     }
@@ -68,7 +69,7 @@ public class ReportService {
 
     public List<ReportDTO> findReportsWithSorting(String field) {
 
-        return  reportRepository.findAll(Sort.by(Sort.Direction.ASC, field)).stream()
+        return reportRepository.findAll(Sort.by(Sort.Direction.ASC, field)).stream()
                 .map(Converter::convertReportToReportDTO)
                 .collect(Collectors.toList());
 
@@ -98,9 +99,12 @@ public class ReportService {
 
     }
 
-    public ReportDTO updateReport(ReportDTO reportDTO, long id) {
+    @Transactional
+    public ReportDTO updateReport(ReportDTO reportDTO, long id, String username) {
+        User user = userRepository.findUserByUsername(username);
 
         Report report = reportRepository.findReportById(id);
+        publisher.publishEvent(new ReportUpdateEventForHistory(this, report, reportDTO, user));
 
         report.setReportName(reportDTO.getReportName());
         report.setQuery(reportDTO.getQuery());
@@ -125,13 +129,20 @@ public class ReportService {
 
     public ResponseMessage deleteAllReports() {
 
-        if(reportRepository.count() > 0) {
+        if (reportRepository.count() > 0) {
             reportRepository.deleteAll();
             return new ResponseMessage("All Reports Have Been DELETED!!!");
         }
 
         return new ResponseMessage("It's Already Empty!!!");
 
+    }
+
+    public List<ReportDTO> searchByTitle(String title, PageRequest pageRequest) {
+        return reportRepository.searchByTitle(title, pageRequest)
+                .stream()
+                .map(Converter::convertReportToReportDTO)
+                .toList();
     }
 
     @Transactional
@@ -155,20 +166,19 @@ public class ReportService {
 
         Object[] columns = null;
 
-        if(report.getColumns() != null)
+        if (report.getColumns() != null)
             columns = Arrays.stream(report.getColumns().trim().split(",")).toArray();
 
         File file;
         List results;
 
         assert columns != null;
-        if(columns.length > 1) {
+        if (columns.length > 1) {
 
             results = getResults(report);
             file = csvExportService.exportQueryResultToCsv(results, filePath, columns);
 
-        }
-        else {
+        } else {
 
             results = getResults(report);
             file = csvExportServiceForSingleColumnResult.exportQueryResultToCsv(results, filePath, columns);

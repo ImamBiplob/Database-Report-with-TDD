@@ -5,11 +5,13 @@ import com.imambiplob.databasereport.dto.ScheduledReportDTO;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.ScheduledReport;
 import com.imambiplob.databasereport.entity.User;
+import com.imambiplob.databasereport.event.ReportUpdateEventForHistory;
 import com.imambiplob.databasereport.repository.ReportRepository;
 import com.imambiplob.databasereport.repository.ScheduledReportRepository;
 import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.util.Converter;
 import jakarta.transaction.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +29,15 @@ public class ScheduledReportService {
     private final UserRepository userRepository;
     private final ReportService reportService;
     private final EmailService emailService;
+    private final ApplicationEventPublisher publisher;
 
-    public ScheduledReportService(ReportRepository reportRepository, ScheduledReportRepository scheduledReportRepository, UserRepository userRepository, ReportService reportService, EmailService emailService) {
+    public ScheduledReportService(ReportRepository reportRepository, ScheduledReportRepository scheduledReportRepository, UserRepository userRepository, ReportService reportService, EmailService emailService, ApplicationEventPublisher publisher) {
         this.reportRepository = reportRepository;
         this.scheduledReportRepository = scheduledReportRepository;
         this.userRepository = userRepository;
         this.reportService = reportService;
         this.emailService = emailService;
+        this.publisher = publisher;
     }
 
     @Scheduled(cron = "${interval-in-cron}")
@@ -42,7 +46,7 @@ public class ScheduledReportService {
 
         List<ScheduledReport> reports = scheduledReportRepository.findAll();
 
-        for(ScheduledReport report : reports) {
+        for (ScheduledReport report : reports) {
             String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
 
             reportService.performExecution(report, filePath);
@@ -80,18 +84,23 @@ public class ScheduledReportService {
 
     }
 
-    public ScheduledReportDTO updateReport(ScheduledReportDTO reportDTO, long id) {
+    @Transactional
+    public ScheduledReportDTO updateReport(ScheduledReportDTO reportDTO, long id, String username) {
+
+        User user = userRepository.findUserByUsername(username);
+
+        Report previousReport = reportRepository.findReportById(id);
+        publisher.publishEvent(new ReportUpdateEventForHistory(this, previousReport, reportDTO, user));
 
         ScheduledReport scheduledReport = new ScheduledReport();
 
-        if(scheduledReportRepository.findScheduledReportById(id) == null) {
+        if (scheduledReportRepository.findScheduledReportById(id) == null) {
 
             Report savedReport = reportRepository.findReportById(id);
 
             scheduledReport.setReportCreator(savedReport.getReportCreator());
             scheduledReport.setCreationTime(savedReport.getCreationTime());
-        }
-        else {
+        } else {
             scheduledReport = scheduledReportRepository.findScheduledReportById(id);
         }
 

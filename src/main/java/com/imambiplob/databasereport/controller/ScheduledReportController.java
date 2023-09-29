@@ -9,12 +9,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
 @RestController
 @RequestMapping("api/reports/scheduled")
 public class ScheduledReportController {
@@ -55,7 +53,7 @@ public class ScheduledReportController {
         if(reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
-        return new ResponseEntity<>(reportService.updateReport(reportDTO, id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.updateReport(reportDTO, id, jwtAuthFilter.getCurrentUser()), HttpStatus.OK);
 
     }
 

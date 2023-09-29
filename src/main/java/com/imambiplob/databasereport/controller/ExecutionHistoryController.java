@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/histories")
+@RequestMapping("api/executionHistories")
 public class ExecutionHistoryController {
 
     private final ExecutionHistoryService executionHistoryService;
@@ -81,7 +81,7 @@ public class ExecutionHistoryController {
     public ModelAndView getHistoryView(@RequestParam long reportId) {
 
         List<ExecutionHistoryDTO> history = executionHistoryService.getHistoryOfReport(reportId);
-        ModelAndView mav = new ModelAndView("list-history");
+        ModelAndView mav = new ModelAndView("list-execution-history");
         mav.addObject("history", history);
 
         return mav;
@@ -93,7 +93,7 @@ public class ExecutionHistoryController {
     public ModelAndView getHistoryDetails(@RequestParam long id) {
 
         ExecutionHistoryDTO history = executionHistoryService.getHistory(id);
-        ModelAndView mav = new ModelAndView("details-history");
+        ModelAndView mav = new ModelAndView("details-execution-history");
         mav.addObject("history", history);
 
         return mav;
