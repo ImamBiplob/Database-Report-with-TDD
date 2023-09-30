@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Details of History</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<div class="container my-5" th:object="${history}">
+
+    <h3>Details of History</h3>
+    <hr/>
+
+    <table class="table table-bordered table-striped table-success table-hover shadow mt-4">
+
+        <tbody>
+
+        <div>
+
+            <tr>
+                <th>ID</th>
+                <td th:text="${history.id}"/>
+            </tr>
+            <tr>
+                <th>Report ID</th>
+                <td th:text="${history.reportId}"/>
+            </tr>
+            <tr>
+                <th>Report Updated By</th>
+                <td th:text="${history.updatedBy}"/>
+            </tr>
+            <tr>
+                <th>Report Updated At</th>
+                <td th:text="${history.updatedAt}"/>
+            </tr>
+            <tr>
+                <th>Previous Report Title</th>
+                <td th:text="${history.previousReportName}"/>
+            </tr>
+            <tr>
+                <th>Updated Report Title</th>
+                <td th:text="${history.updatedReportName}"/>
+            </tr>
+            <tr>
+                <th>Previous SQL Query</th>
+                <td th:text="${history.previousSqlQuery}"/>
+            </tr>
+            <tr>
+                <th>Updated SQL Query</th>
+                <td th:text="${history.updatedSqlQuery}"/>
+            </tr>
+            <tr>
+                <th>Previous Scheduled Status</th>
+                <td th:text="${history.previousScheduledStatus}"/>
+            </tr>
+            <tr>
+                <th>Updated Scheduled Status</th>
+                <td th:text="${history.updatedScheduledStatus}"/>
+            </tr>
+
+        </div>
+
+        </tbody>
+
+    </table>
+
+    <table class="table table-bordered table-striped table-success table-hover shadow">
+
+        <thead>
+        <tr>
+            <th>Previous Param Name</th>
+            <th>Previous Param Value</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="parameter: ${history.previousParamsMap}">
+            <td th:text="${parameter.key}"/>
+            <td th:text="${parameter.value}"/>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <table class="table table-bordered table-striped table-success table-hover shadow mb-4">
+
+        <thead>
+        <tr>
+            <th>Updated Param Name</th>
+            <th>Updated Param Value</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="parameter: ${history.updatedParamsMap}">
+            <td th:text="${parameter.key}"/>
+            <td th:text="${parameter.value}"/>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <hr/>
+    <a th:href="@{/api/updateHistories/view(reportId=${history.reportId})}">Back to History List</a>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
