@@ -26,4 +26,6 @@ public class ScheduledReportDTO extends ReportDTO implements Serializable {
 
     private LocalTime time;
 
+    private String emailAddress;
+
 }

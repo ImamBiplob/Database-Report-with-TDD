@@ -66,9 +66,13 @@
                 <label for="yearly">Yearly:</label>
                 <input type="checkbox" id="yearly" th:field="*{yearly}"/>
             </div>
-            <div class="mb-4" id="timeField" style="display: none;">
+            <div class="mb-2" id="timeField" style="display: none;">
                 <label for="time">Time:</label>
                 <input type="text" id="time" th:field="*{time}" placeholder="HH:mm"/>
+            </div>
+            <div class="mb-4" id="emailField" style="display: none;">
+                <label for="email">Email Address:</label>
+                <input type="text" id="email" th:field="*{emailAddress}" placeholder="Enter Email Address"/>
             </div>
 
             <div id="params-container">
@@ -125,6 +129,7 @@
         const monthlyField = document.getElementById("monthlyField");
         const yearlyField = document.getElementById("yearlyField");
         const timeField = document.getElementById("timeField");
+        const emailField = document.getElementById("emailField");
 
         if (scheduledCheckbox.checked) {
             dailyField.style.display = "block";
@@ -132,12 +137,14 @@
             monthlyField.style.display = "block";
             yearlyField.style.display = "block";
             timeField.style.display = "block";
+            emailField.style.display = "block";
         } else {
             dailyField.style.display = "none";
             weeklyField.style.display = "none";
             monthlyField.style.display = "none";
             yearlyField.style.display = "none";
             timeField.style.display = "none";
+            emailField.style.display = "none";
         }
 
     }
@@ -148,12 +155,14 @@
         const monthlyField = document.getElementById("monthlyField");
         const yearlyField = document.getElementById("yearlyField");
         const timeField = document.getElementById("timeField");
+        const emailField = document.getElementById("emailField");
 
         dailyField.style.display = "block";
         weeklyField.style.display = "block";
         monthlyField.style.display = "block";
         yearlyField.style.display = "block";
         timeField.style.display = "block";
+        emailField.style.display = "block";
     }
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -79,6 +79,7 @@ public class Converter {
         reportView.setCreationTime(reportDTO.getCreationTime());
         reportView.setLastUpdateTime(reportDTO.getLastUpdateTime());
         reportView.setDownloadLink(reportDTO.getDownloadLink());
+        reportView.setEmailAddress(reportDTO.getEmailAddress());
         List<ParamDTO> paramsList = new ArrayList<>();
 
         for(String paramName : reportDTO.getParamsMap().keySet()) {
@@ -112,6 +113,7 @@ public class Converter {
         reportDTO.setCreationTime(reportView.getCreationTime());
         reportDTO.setLastUpdateTime(reportView.getLastUpdateTime());
         reportDTO.setDownloadLink(reportView.getDownloadLink());
+        reportDTO.setEmailAddress(reportView.getEmailAddress());
         Map<String, String> paramsMap = new HashMap<>();
 
         if(reportView.getParamsList() != null) {
@@ -200,6 +202,7 @@ public class Converter {
         reportDTO.setWeekly(report.isWeekly());
         reportDTO.setMonthly(report.isMonthly());
         reportDTO.setYearly(report.isYearly());
+        reportDTO.setEmailAddress(report.getEmailAddress());
 
         return reportDTO;
 
@@ -224,6 +227,7 @@ public class Converter {
         report.setWeekly(reportDTO.isWeekly());
         report.setMonthly(reportDTO.isMonthly());
         report.setYearly(reportDTO.isYearly());
+        report.setEmailAddress(report.getEmailAddress());
         report.getParamsMap().remove("");
 
         return report;

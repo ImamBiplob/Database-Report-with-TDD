@@ -27,4 +27,6 @@ public class ScheduledReport extends Report {
 
     private LocalTime time;
 
+    private String emailAddress;
+
 }

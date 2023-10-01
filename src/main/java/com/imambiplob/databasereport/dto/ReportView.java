@@ -48,4 +48,6 @@ public class ReportView implements Serializable {
 
     private LocalTime time;
 
+    private String emailAddress;
+
 }
