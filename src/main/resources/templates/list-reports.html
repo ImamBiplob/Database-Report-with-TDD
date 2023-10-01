@@ -26,9 +26,12 @@
 
     <hr/>
     <div class="d-flex justify-content-between align-items-center">
-        <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
-        <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span class="fw-bold" sec:authentication="authorities"></span></p>
-        <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/scheduled/view}" class="btn btn-outline-primary shadow">Show Scheduled Reports</a>
+        <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" id="addReportButton"
+           th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
+        <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span
+                class="fw-bold" sec:authentication="authorities"></span></p>
+        <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/scheduled/view}"
+           class="btn btn-outline-primary shadow">Show Scheduled Reports</a>
     </div>
     <hr/>
 
@@ -53,11 +56,19 @@
             <td th:text="${report.creationTime}"/>
             <td th:text="${report.lastUpdateTime}"/>
             <td>
-                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
-                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}" class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
-                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
-                <a sec:authorize="hasAnyAuthority('SYS_ROOT')" th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
-                    History</a>
+                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}"
+                   class="btn btn-warning my-1 ms-1 shadow">Run</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')"
+                   th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}"
+                   class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
+                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}"
+                   class="btn btn-danger my-1 ms-1 shadow">Delete</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT')"
+                   th:href="@{/api/executionHistories/view(reportId=${report.id})}"
+                   class="btn btn-info my-1 ms-1 shadow">Execution History</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT')"
+                   th:href="@{/api/updateHistories/view(reportId=${report.id})}"
+                   class="btn btn-info my-1 ms-1 shadow">Update History</a>
             </td>
         </tr>
         </tbody>
@@ -68,162 +79,6 @@
     <a href="#" class="btn btn-sm btn-outline-secondary shadow mb-2">Go Top 🔝</a>
 
 </div>
-
-<!--<script th:inline="javascript">-->
-<!--    document.addEventListener("DOMContentLoaded", function () {-->
-<!--        // Find the "Run" button element by its ID-->
-<!--        var runButton = document.getElementById("runButton");-->
-
-<!--        // Add a click event listener to the button-->
-<!--        runButton.addEventListener("click", function (event) {-->
-<!--            // Prevent the default behavior of the link-->
-<!--            event.preventDefault();-->
-
-<!--            // Retrieve the JWT token from local storage-->
-<!--            var token = localStorage.getItem("token"); // Replace with your actual key-->
-
-<!--            // Check if the token is available-->
-<!--            if (token) {-->
-<!--                // Create a new XMLHttpRequest or use Fetch API to make the API request-->
-<!--                var xhr = new XMLHttpRequest();-->
-<!--                var url = runButton.getAttribute("th:href");-->
-
-<!--                // Open the request-->
-<!--                xhr.open("GET", url, true);-->
-
-<!--                // Set the "Authorization" header with the JWT token-->
-<!--                xhr.setRequestHeader("Authorization", "Bearer " + token);-->
-
-<!--                // Define the callback function for when the request is complete-->
-<!--                xhr.onload = function () {-->
-<!--                    // Check the response status and handle it as needed-->
-<!--                    if (xhr.status === 200) {-->
-<!--                        // Handle a successful response-->
-<!--                        console.log("Request was successful!");-->
-<!--                    } else {-->
-<!--                        // Handle an error response-->
-<!--                        console.error("Request failed with status: " + xhr.status);-->
-<!--                    }-->
-<!--                };-->
-
-<!--                // Send the request-->
-<!--                xhr.send();-->
-<!--            } else {-->
-<!--                // Handle the case where the token is not available in local storage-->
-<!--                console.error("JWT token not found in local storage.");-->
-<!--            }-->
-<!--        });-->
-<!--    });-->
-<!--</script>-->
-
-
-<!--<script th:inline="javascript">-->
-<!--    // Attach a click event handler to the "Add New Report" button-->
-<!--    document.getElementById("addReportButton").addEventListener("click", function () {-->
-<!--        // Retrieve the JWT token from local storage-->
-<!--        const token = localStorage.getItem("token");-->
-
-<!--        // Check if the token exists in local storage-->
-<!--        if (token) {-->
-<!--            // Perform the API request with the "Authorization" header-->
-<!--            fetch("/api/reports/view/addReportForm", {-->
-<!--                method: "GET",-->
-<!--                headers: {-->
-<!--                    "Authorization": `Bearer ${token}`-->
-<!--                }-->
-<!--            })-->
-<!--                .then((response) => response.text()) // Convert the response to text-->
-<!--                .then((html) => {-->
-<!--                    console.log(html)-->
-<!--                    // Update the content of a specific element with the received HTML-->
-<!--                    document.getElementById("contentContainer").innerHTML = html;-->
-<!--                })-->
-<!--                .catch(error => {-->
-<!--                    // Handle network or other errors-->
-<!--                    console.error("API request error:", error);-->
-<!--                });-->
-<!--        } else {-->
-<!--            // Token is not available in local storage, handle accordingly-->
-<!--            console.error("JWT token not found in local storage");-->
-<!--            // You can redirect to the login page or display an error message here-->
-<!--        }-->
-<!--    });-->
-<!--</script>-->
-
-<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-<!--<script th:inline="javascript">-->
-<!--    $(document).ready(function() {-->
-<!--        // Attach a click event handler to the "Run" button-->
-<!--        $("#addReportButton").click(function() {-->
-<!--            // Get the URL from the button's href attribute-->
-<!--            // const url = $("#addReportButton").attr("href");-->
-
-<!--            const token = localStorage.getItem("token");-->
-
-<!--            // Make sure a token exists before making the request-->
-<!--            if (!token) {-->
-<!--                alert("JWT token not found in local storage. Please log in.");-->
-<!--                return;-->
-<!--            }-->
-<!--            // Make an AJAX request to the API-->
-<!--            $.ajax({-->
-<!--                url: 'http://localhost:9191/api/reports/view/addReportForm',-->
-<!--                method: "GET",-->
-<!--                headers: {-->
-<!--                    "Authorization": "Bearer " + token-->
-<!--                },-->
-<!--                success: function(data) {-->
-<!--                    // Assuming the API response contains the HTML content-->
-<!--                    // Display the HTML content in the result container-->
-<!--                    $("#resultContainer").html(data);-->
-<!--                },-->
-<!--                error: function(xhr, status, error) {-->
-<!--                    console.error("Error:", error);-->
-<!--                }-->
-<!--            });-->
-
-<!--            // Prevent the default behavior of the link-->
-<!--            return false;-->
-<!--        });-->
-<!--    });-->
-<!--</script>-->
-<!--<script th:inline="javascript">-->
-<!--    $(document).ready(function() {-->
-<!--        // Attach a click event handler to the "Run" button-->
-<!--        $("#runButton").click(function() {-->
-<!--            // Get the URL from the button's href attribute-->
-<!--            const url = $("#runButton").attr("href");-->
-
-<!--            const token = localStorage.getItem("token");-->
-
-<!--            // Make sure a token exists before making the request-->
-<!--            if (!token) {-->
-<!--                alert("JWT token not found in local storage. Please log in.");-->
-<!--                return;-->
-<!--            }-->
-
-<!--            // Make an AJAX request to the API-->
-<!--            $.ajax({-->
-<!--                url: url,-->
-<!--                method: "GET",-->
-<!--                headers: {-->
-<!--                    "Authorization": "Bearer " + token-->
-<!--                },-->
-<!--                success: function(data) {-->
-<!--                    // Assuming the API response contains the HTML content-->
-<!--                    // Display the HTML content in the result container-->
-<!--                    $("#resultContainer").html(data);-->
-<!--                },-->
-<!--                error: function(xhr, status, error) {-->
-<!--                    console.error("Error:", error);-->
-<!--                }-->
-<!--            });-->
-
-<!--            // Prevent the default behavior of the link-->
-<!--            return false;-->
-<!--        });-->
-<!--    });-->
-<!--</script>-->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>

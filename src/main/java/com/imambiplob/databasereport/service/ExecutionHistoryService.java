@@ -1,9 +1,9 @@
 package com.imambiplob.databasereport.service;
 
-import com.imambiplob.databasereport.dto.HistoryDTO;
+import com.imambiplob.databasereport.dto.ExecutionHistoryDTO;
 import com.imambiplob.databasereport.entity.ReportExecutionHistory;
 import com.imambiplob.databasereport.event.ReportExecutionEventForHistory;
-import com.imambiplob.databasereport.repository.HistoryRepository;
+import com.imambiplob.databasereport.repository.ExecutionHistoryRepository;
 import com.imambiplob.databasereport.util.Converter;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import static com.imambiplob.databasereport.util.Converter.convertHistoryToHistoryDTO;
 
 @Service
-public class HistoryService {
+public class ExecutionHistoryService {
 
-    private final HistoryRepository historyRepository;
+    private final ExecutionHistoryRepository executionHistoryRepository;
 
-    public HistoryService(HistoryRepository historyRepository) {
-        this.historyRepository = historyRepository;
+    public ExecutionHistoryService(ExecutionHistoryRepository executionHistoryRepository) {
+        this.executionHistoryRepository = executionHistoryRepository;
     }
 
     @EventListener
@@ -42,28 +42,28 @@ public class HistoryService {
         }
         history.setParamsMap(paramsMap);
 
-        historyRepository.save(history);
+        executionHistoryRepository.save(history);
 
     }
 
-    public List<HistoryDTO> getHistories() {
+    public List<ExecutionHistoryDTO> getHistories() {
 
-        return historyRepository.findAll().stream().map(Converter::convertHistoryToHistoryDTO).toList();
+        return executionHistoryRepository.findAll().stream().map(Converter::convertHistoryToHistoryDTO).toList();
 
     }
 
-    public List<HistoryDTO> findHistoriesWithSorting(String field) {
+    public List<ExecutionHistoryDTO> findHistoriesWithSorting(String field) {
 
-        return  historyRepository.findAll(Sort.by(Sort.Direction.ASC, field))
+        return  executionHistoryRepository.findAll(Sort.by(Sort.Direction.ASC, field))
                 .stream()
                 .map(Converter::convertHistoryToHistoryDTO)
                 .collect(Collectors.toList());
 
     }
 
-    public List<HistoryDTO> findHistoriesWithPagination(int offset, int pageSize) {
+    public List<ExecutionHistoryDTO> findHistoriesWithPagination(int offset, int pageSize) {
 
-        return historyRepository.findAll(PageRequest.of(offset, pageSize))
+        return executionHistoryRepository.findAll(PageRequest.of(offset, pageSize))
                 .getContent()
                 .stream()
                 .map(Converter::convertHistoryToHistoryDTO)
@@ -71,9 +71,9 @@ public class HistoryService {
 
     }
 
-    public List<HistoryDTO> findHistoriesWithPaginationAndSorting(int offset, int pageSize, String field) {
+    public List<ExecutionHistoryDTO> findHistoriesWithPaginationAndSorting(int offset, int pageSize, String field) {
 
-        return historyRepository.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by(field)))
+        return executionHistoryRepository.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by(field)))
                 .getContent()
                 .stream()
                 .map(Converter::convertHistoryToHistoryDTO)
@@ -81,18 +81,18 @@ public class HistoryService {
 
     }
 
-    public HistoryDTO getHistory(long id) {
+    public ExecutionHistoryDTO getHistory(long id) {
 
-        if(historyRepository.findById(id).isPresent())
-            return convertHistoryToHistoryDTO(historyRepository.findById(id).get());
+        if(executionHistoryRepository.findById(id).isPresent())
+            return convertHistoryToHistoryDTO(executionHistoryRepository.findById(id).get());
 
         return null;
 
     }
 
-    public List<HistoryDTO> getHistoryOfReport(long reportId) {
+    public List<ExecutionHistoryDTO> getHistoryOfReport(long reportId) {
 
-        return historyRepository.findReportExecutionHistoriesByReportIdIs(reportId)
+        return executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(reportId)
                 .stream().map(Converter::convertHistoryToHistoryDTO)
                 .toList();
 

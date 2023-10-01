@@ -230,19 +230,39 @@ public class Converter {
 
     }
 
-    public static HistoryDTO convertHistoryToHistoryDTO(ReportExecutionHistory history) {
+    public static ExecutionHistoryDTO convertHistoryToHistoryDTO(ReportExecutionHistory history) {
 
         if(history == null)
             return null;
 
-        HistoryDTO historyDTO = new HistoryDTO();
+        ExecutionHistoryDTO executionHistoryDTO = new ExecutionHistoryDTO();
+        executionHistoryDTO.setId(history.getId());
+        executionHistoryDTO.setReportId(history.getReport().getId());
+        executionHistoryDTO.setReportName(history.getReportName());
+        executionHistoryDTO.setReportExecutorName(history.getReportExecutor().getUsername());
+        executionHistoryDTO.setSqlQuery(history.getSqlQuery());
+        executionHistoryDTO.setParamsMap(history.getParamsMap());
+        executionHistoryDTO.setExecutionTime(history.getExecutionTime());
+
+        return executionHistoryDTO;
+
+    }
+
+    public static UpdateHistoryDTO convertUpdateHistoryToUpdateHistoryDTO(ReportUpdateHistory history) {
+
+        UpdateHistoryDTO historyDTO = new UpdateHistoryDTO();
         historyDTO.setId(history.getId());
         historyDTO.setReportId(history.getReport().getId());
-        historyDTO.setReportName(history.getReportName());
-        historyDTO.setReportExecutorName(history.getReportExecutor().getUsername());
-        historyDTO.setSqlQuery(history.getSqlQuery());
-        historyDTO.setParamsMap(history.getParamsMap());
-        historyDTO.setExecutionTime(history.getExecutionTime());
+        historyDTO.setUpdatedAt(history.getUpdatedAt());
+        historyDTO.setUpdatedBy(history.getUpdatedBy().getUsername());
+        historyDTO.setPreviousReportName(history.getPreviousReportName());
+        historyDTO.setUpdatedReportName(history.getUpdatedReportName());
+        historyDTO.setPreviousSqlQuery(history.getPreviousSqlQuery());
+        historyDTO.setUpdatedSqlQuery(history.getUpdatedSqlQuery());
+        historyDTO.setPreviousScheduledStatus(history.isPreviousScheduledStatus());
+        historyDTO.setUpdatedScheduledStatus(history.isUpdatedScheduledStatus());
+        historyDTO.setPreviousParamsMap(history.getPreviousParamsMap());
+        historyDTO.setUpdatedParamsMap(history.getUpdatedParamsMap());
 
         return historyDTO;
 

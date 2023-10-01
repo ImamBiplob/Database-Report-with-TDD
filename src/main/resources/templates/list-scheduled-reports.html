@@ -26,8 +26,10 @@
 
     <hr/>
     <div class="d-flex justify-content-between align-items-center">
-        <a id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New Report</a>
-        <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span class="fw-bold" sec:authentication="authorities"></span></p>
+        <a id="addReportButton" th:href="@{/api/reports/view/addReportForm}" class="btn btn-primary shadow-lg">Add New
+            Report</a>
+        <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span
+                class="fw-bold" sec:authentication="authorities"></span></p>
         <a th:href="@{/api/reports/view}" class="btn btn-outline-primary shadow">Back to List of Reports</a>
     </div>
     <hr/>
@@ -53,11 +55,19 @@
             <td th:text="${report.creationTime}"/>
             <td th:text="${report.lastUpdateTime}"/>
             <td>
-                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning my-1 ms-1 shadow">Run</a>
-                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}" class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
-                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger my-1 ms-1 shadow">Delete</a>
-                <a sec:authorize="hasAnyAuthority('SYS_ROOT')" th:href="@{/api/histories/view(reportId=${report.id})}" class="btn btn-info my-1 ms-1 shadow">Execution
-                    History</a>
+                <a id="runButton" th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}"
+                   class="btn btn-warning my-1 ms-1 shadow">Run</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')"
+                   th:href="@{/api/reports/view/editReportForm/{reportId}(reportId=${report.id})}"
+                   class="btn btn-secondary my-1 ms-1 shadow">Edit</a>
+                <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}"
+                   class="btn btn-danger my-1 ms-1 shadow">Delete</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT')"
+                   th:href="@{/api/executionHistories/view(reportId=${report.id})}"
+                   class="btn btn-info my-1 ms-1 shadow">Execution History</a>
+                <a sec:authorize="hasAnyAuthority('SYS_ROOT')"
+                   th:href="@{/api/updateHistories/view(reportId=${report.id})}"
+                   class="btn btn-info my-1 ms-1 shadow">Update History</a>
             </td>
         </tr>
         </tbody>
@@ -76,7 +86,7 @@
         $("#reportTable").DataTable({
             'aoColumnDefs': [{
                 'bSortable': false,
-                'aTargets': [-1] /* 1st one, start by the right */
+                'aTargets': [-1]
             }]
         });
     })

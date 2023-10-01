@@ -7,6 +7,8 @@ import com.imambiplob.databasereport.security.JwtAuthFilter;
 import com.imambiplob.databasereport.service.ReportService;
 import com.imambiplob.databasereport.service.ScheduledReportService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,12 +59,12 @@ public class ReportController {
 
         if(!reportView.isScheduled()) {
             ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
-            reportService.updateReport(reportDTO, reportDTO.getId());
+            reportService.updateReport(reportDTO, reportDTO.getId(), jwtAuthFilter.getCurrentUser());
         }
 
         else {
             ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
-            scheduledReportService.updateReport(reportDTO, reportDTO.getId());
+            scheduledReportService.updateReport(reportDTO, reportDTO.getId(), jwtAuthFilter.getCurrentUser());
         }
 
         return "redirect:/api/reports/view/editReportForm/" + reportView.getId();
@@ -231,7 +233,7 @@ public class ReportController {
         if(reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
-        return new ResponseEntity<>(reportService.updateReport(reportDTO, id), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.updateReport(reportDTO, id, jwtAuthFilter.getCurrentUser()), HttpStatus.OK);
 
     }
 
@@ -252,6 +254,13 @@ public class ReportController {
 
         return new ResponseEntity<>(reportService.deleteAllReports(), HttpStatus.OK);
 
+    }
+
+    @GetMapping("/searchBy/{title}")
+    public List<ReportDTO> searchByTitle(@PathVariable String title,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "10") int size) {
+        return reportService.searchByTitle(title, PageRequest.of(page, size).withSort(Sort.by("reportName")));
     }
 
 }

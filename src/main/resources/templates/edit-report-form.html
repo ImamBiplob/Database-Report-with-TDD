@@ -47,33 +47,31 @@
             </div>
 
             <label for="scheduled">Scheduled:</label>
-            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()" />
+            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()"/>
             <a class="btn btn-secondary btn-sm mb-2 ms-2" th:if="${report.scheduled != false}" onclick="showFields()">Expand</a>
 
             <div class="mb-2" id="dailyField" style="display: none;">
                 <label for="daily">Daily:</label>
-                <input type="checkbox" id="daily" th:field="*{daily}" />
+                <input type="checkbox" id="daily" th:field="*{daily}"/>
             </div>
             <div class="mb-2" id="weeklyField" style="display: none;">
                 <label for="weekly">Weekly:</label>
-                <input type="checkbox" id="weekly" th:field="*{weekly}" />
+                <input type="checkbox" id="weekly" th:field="*{weekly}"/>
             </div>
             <div class="mb-2" id="monthlyField" style="display: none;">
                 <label for="monthly">Monthly:</label>
-                <input type="checkbox" id="monthly" th:field="*{monthly}" />
+                <input type="checkbox" id="monthly" th:field="*{monthly}"/>
             </div>
             <div class="mb-2" id="yearlyField" style="display: none;">
                 <label for="yearly">Yearly:</label>
-                <input type="checkbox" id="yearly" th:field="*{yearly}" />
+                <input type="checkbox" id="yearly" th:field="*{yearly}"/>
             </div>
-<!--            th:if="${report.scheduled != false}"-->
             <div class="mb-4" id="timeField" style="display: none;">
                 <label for="time">Time:</label>
-                <input type="text" id="time" th:field="*{time}" placeholder="HH:mm" />
+                <input type="text" id="time" th:field="*{time}" placeholder="HH:mm"/>
             </div>
 
             <div id="params-container">
-                <!-- Iterate over the paramsList and create input fields for ParamDTO objects -->
                 <div class="param-row" th:each="paramItem, paramIndex : *{paramsList}">
 
                     <label>Parameter Name:</label>
@@ -105,8 +103,10 @@
 
         </form>
 
-        <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}" class="btn btn-warning me-1 mt-2 shadow">Run</a>
-        <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}" class="btn btn-danger mt-2 shadow">Delete</a>
+        <a th:href="@{/api/reports/view/runResult/{id}(id=${report.id})}"
+           class="btn btn-warning me-1 mt-2 shadow">Run</a>
+        <a sec:authorize="hasAuthority('SYS_ROOT')" th:href="@{/api/reports/delete/{id}(id=${report.id})}"
+           class="btn btn-danger mt-2 shadow">Delete</a>
 
     </div>
 
@@ -158,7 +158,9 @@
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // JavaScript function to add a new ParamDTO input row
+    /**
+     * JavaScript function to add a new ParamDTO input row
+     */
     function addParamRow() {
         const newRow = $('<div class="param-row">');
         newRow.append('<label>Parameter Name:</label> <input type="text" class="me-1 my-1" name="paramsList[' + ($('.param-row').length) + '].paramName" placeholder="Enter Parameter Name">');
@@ -167,7 +169,9 @@
         $('#params-container').append(newRow);
     }
 
-    // JavaScript function to remove a ParamDTO input row
+    /**
+     * JavaScript function to remove a ParamDTO input row
+     */
     function removeParamRow(button) {
         $(button).parent().remove();
     }
