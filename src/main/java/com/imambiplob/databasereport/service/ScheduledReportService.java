@@ -114,6 +114,7 @@ public class ScheduledReportService {
         scheduledReport.setWeekly(reportDTO.isWeekly());
         scheduledReport.setMonthly(reportDTO.isMonthly());
         scheduledReport.setYearly(reportDTO.isYearly());
+        scheduledReport.setEmailAddress(reportDTO.getEmailAddress());
         scheduledReport.getParamsMap().remove("");
 
         return convertScheduledReportToScheduledReportDTO(scheduledReportRepository.save(scheduledReport));
