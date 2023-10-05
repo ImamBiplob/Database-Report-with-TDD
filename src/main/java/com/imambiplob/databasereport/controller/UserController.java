@@ -69,7 +69,7 @@ public class UserController {
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
             cookie.setPath("/api");
-            cookie.setDomain("localhost");
+            cookie.setDomain("report.jotno.dev");
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
