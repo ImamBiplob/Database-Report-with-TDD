@@ -174,7 +174,7 @@ public class Converter {
         report.setParamsMap(reportDTO.getParamsMap());
         report.setReportCreator(user);
         report.setScheduled(reportDTO.isScheduled());
-        report.getParamsMap().remove("");
+//        report.getParamsMap().remove("");
 
         return report;
 

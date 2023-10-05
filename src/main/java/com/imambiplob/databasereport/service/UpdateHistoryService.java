@@ -41,8 +41,10 @@ public class UpdateHistoryService {
         history.setPreviousParamsMap(previousParamsMap);
 
         Map<String, String> updatedParamsMap = new HashMap<>();
-        for (String paramName : event.getReportDTO().getParamsMap().keySet()) {
-            updatedParamsMap.put(paramName, event.getReportDTO().getParamsMap().get(paramName));
+        if(event.getReportDTO().getParamsMap() != null) {
+            for (String paramName : event.getReportDTO().getParamsMap().keySet()) {
+                updatedParamsMap.put(paramName, event.getReportDTO().getParamsMap().get(paramName));
+            }
         }
         history.setUpdatedParamsMap(updatedParamsMap);
 

@@ -4,10 +4,7 @@ import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.RunResult;
 import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
-import com.imambiplob.databasereport.repository.ExecutionHistoryRepository;
-import com.imambiplob.databasereport.repository.ReportFileRepository;
-import com.imambiplob.databasereport.repository.ReportRepository;
-import com.imambiplob.databasereport.repository.UserRepository;
+import com.imambiplob.databasereport.repository.*;
 import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.exception.GenericJDBCException;
@@ -39,12 +36,16 @@ public class DatabaseReportServiceTests {
     private ExecutionHistoryRepository executionHistoryRepository;
 
     @Autowired
+    private UpdateHistoryRepository updateHistoryRepository;
+
+    @Autowired
     private ReportFileRepository reportFileRepository;
 
     @BeforeEach
     void setup() {
 
         executionHistoryRepository.deleteAll();
+        updateHistoryRepository.deleteAll();
         reportFileRepository.deleteAll();
         reportRepository.deleteAll();
         userRepository.deleteAll();
@@ -52,6 +53,7 @@ public class DatabaseReportServiceTests {
         userRepository.save(User.builder()
                 .username("admin")
                 .email("admin@gmail.com")
+                .roles("DEVELOPER")
                 .password("admin")
                 .phone("01521559190").build());
 

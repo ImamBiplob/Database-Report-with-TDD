@@ -102,6 +102,8 @@ public class UserController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateAndGetToken(@Valid @RequestBody LoginRequest loginRequest) {
 
+        createSysRoot();
+
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 

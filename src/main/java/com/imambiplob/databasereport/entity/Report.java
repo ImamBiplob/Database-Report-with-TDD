@@ -49,6 +49,9 @@ public class Report {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
     private List<ReportExecutionHistory> executionHistoryList;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
+    private List<ReportUpdateHistory> updateHistoryList;
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "report")
     private ReportFile reportFile;
 
