@@ -46,6 +46,8 @@ public class UserController {
     public ModelAndView login() {
 
         createSysRoot();
+        createDeveloper();
+        createEndUser();
 
         ModelAndView mav = new ModelAndView("login-form");
         LoginRequest loginRequest = new LoginRequest();
@@ -69,13 +71,11 @@ public class UserController {
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
             cookie.setPath("/api");
-            cookie.setDomain("report.jotno.dev");
+            cookie.setDomain("localhost");
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
-        }
-
-        else throw new UsernameNotFoundException("Invalid User Request!!!");
+        } else throw new UsernameNotFoundException("Invalid User Request!!!");
     }
 
     @GetMapping("/logout")
@@ -87,7 +87,7 @@ public class UserController {
                 if ("token".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/api");
-                    cookie.setDomain("report.jotno.dev");
+                    cookie.setDomain("localhost");
                     response.addCookie(cookie);
                     break;
                 }
@@ -103,6 +103,8 @@ public class UserController {
     public ResponseEntity<?> authenticateAndGetToken(@Valid @RequestBody LoginRequest loginRequest) {
 
         createSysRoot();
+        createDeveloper();
+        createEndUser();
 
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -110,7 +112,7 @@ public class UserController {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwtService.generateToken(loginRequest.getUsername()));
 
-        if(authentication.isAuthenticated())
+        if (authentication.isAuthenticated())
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
         else throw new UsernameNotFoundException("Invalid User Request!!!");
@@ -135,13 +137,13 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> getUser(@PathVariable long id) {
-        if(userRepository.findById(id).isPresent())
+        if (userRepository.findById(id).isPresent())
             return new ResponseEntity<>(userRepository.findById(id).get(), HttpStatus.OK);
         return new ResponseEntity<>(new ResponseMessage("User with ID: " + id + " doesn't exist"), HttpStatus.NOT_FOUND);
     }
 
     public void createSysRoot() {
-        if(userRepository.findUserByUsername("imambiplob") == null) {
+        if (userRepository.findUserByUsername("imambiplob") == null) {
             User user = new User();
             user.setName("Imam Hossain");
             user.setUsername("imambiplob");
@@ -149,6 +151,34 @@ public class UserController {
             user.setEmail("imamhbiplob@gmail.com");
             user.setPhone("01521559190");
             user.setRoles("SYS_ROOT,DEVELOPER");
+
+            userRepository.save(user);
+        }
+    }
+
+    public void createDeveloper() {
+        if (userRepository.findUserByUsername("developer") == null) {
+            User user = new User();
+            user.setName("Developer");
+            user.setUsername("developer");
+            user.setPassword(passwordEncoder.encode("dev123"));
+            user.setEmail("developer@jotno.net");
+            user.setPhone("01xxxxxxxxx");
+            user.setRoles("DEVELOPER");
+
+            userRepository.save(user);
+        }
+    }
+
+    public void createEndUser() {
+        if (userRepository.findUserByUsername("user") == null) {
+            User user = new User();
+            user.setName("user");
+            user.setUsername("user");
+            user.setPassword(passwordEncoder.encode("user123"));
+            user.setEmail("user@jotno.net");
+            user.setPhone("01xxxxxxxxx");
+            user.setRoles("USER");
 
             userRepository.save(user);
         }

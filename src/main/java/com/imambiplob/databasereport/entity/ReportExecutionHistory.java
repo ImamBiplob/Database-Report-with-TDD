@@ -31,7 +31,7 @@ public class ReportExecutionHistory {
     private String sqlQuery;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "history_paramsMapping",
+    @CollectionTable(name = "execution_history_paramsMapping",
             joinColumns = {@JoinColumn(name = "history_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "param_name")
     @Column(name = "param_value")

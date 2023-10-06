@@ -31,7 +31,7 @@
         <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span
                 class="fw-bold" sec:authentication="authorities"></span></p>
         <a sec:authorize="hasAnyAuthority('SYS_ROOT','DEVELOPER')" th:href="@{/api/reports/scheduled/view}"
-           class="btn btn-outline-primary shadow">Show Scheduled Reports</a>
+           class="btn btn-outline-primary shadow">View Scheduled Reports</a>
     </div>
     <hr/>
 

@@ -1,7 +1,9 @@
 package com.imambiplob.databasereport;
 
 import com.imambiplob.databasereport.entity.Report;
+import com.imambiplob.databasereport.entity.User;
 import com.imambiplob.databasereport.repository.ReportRepository;
+import com.imambiplob.databasereport.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +20,20 @@ public class DatabaseReportRepositoryTests {
     @Autowired
     private ReportRepository reportRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setup() {
-        reportRepository.deleteAll();
+//        reportRepository.deleteAll();
+        userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+
+        userRepository.save(User.builder()
+                .username("admin")
+                .email("admin@gmail.com")
+                .roles("DEVELOPER")
+                .password("admin")
+                .phone("01521559190").build());
     }
 
     @Test
@@ -30,6 +43,7 @@ public class DatabaseReportRepositoryTests {
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, gender, hire_date from employees")
                 .columns("first_name,gender,hire_date")
+                .reportCreator(userRepository.findUserByUsername("admin"))
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -43,6 +57,7 @@ public class DatabaseReportRepositoryTests {
     public void saveReportWithFailure() {
 
         Report report = Report.builder().reportName("Unnamed")
+                .reportCreator(userRepository.findUserByUsername("admin"))
                 .query("")
                 .build();
 
@@ -57,6 +72,7 @@ public class DatabaseReportRepositoryTests {
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, gender, hire_date from employees")
                 .columns("first_name,gender,hire_date")
+                .reportCreator(userRepository.findUserByUsername("admin"))
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -84,6 +100,7 @@ public class DatabaseReportRepositoryTests {
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, gender, hire_date from employees")
                 .columns("first_name,gender,hire_date")
+                .reportCreator(userRepository.findUserByUsername("admin"))
                 .build();
 
         reportRepository.save(report);
@@ -107,6 +124,7 @@ public class DatabaseReportRepositoryTests {
         Report report = Report.builder().reportName("All Employees")
                 .query("select first_name, gender, hire_date from employees")
                 .columns("first_name,gender,hire_date")
+                .reportCreator(userRepository.findUserByUsername("admin"))
                 .build();
 
         reportRepository.save(report);
