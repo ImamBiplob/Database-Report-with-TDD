@@ -26,7 +26,10 @@ public class DatabaseReportRepositoryTests {
     @BeforeEach
     void setup() {
 //        reportRepository.deleteAll();
-        userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+        if (userRepository.findUserByUsername("admin") != null) {
+            reportRepository.deleteAllByReportCreatorId(userRepository.findUserByUsername("admin").getId());
+            userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+        }
 
         userRepository.save(User.builder()
                 .username("admin")

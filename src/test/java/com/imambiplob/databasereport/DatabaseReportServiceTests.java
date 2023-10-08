@@ -47,7 +47,10 @@ public class DatabaseReportServiceTests {
 //        updateHistoryRepository.deleteAll();
 //        reportFileRepository.deleteAll();
 //        reportRepository.deleteAll();
-        userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+        if (userRepository.findUserByUsername("admin") != null) {
+            reportRepository.deleteAllByReportCreatorId(userRepository.findUserByUsername("admin").getId());
+            userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+        }
 
         userRepository.save(User.builder()
                 .username("admin")

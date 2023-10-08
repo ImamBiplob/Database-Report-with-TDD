@@ -35,8 +35,10 @@ public class UpdateHistoryService {
         history.setUpdatedScheduledStatus(event.getReportDTO().isScheduled());
 
         Map<String, String> previousParamsMap = new HashMap<>();
-        for (String paramName : event.getReport().getParamsMap().keySet()) {
-            previousParamsMap.put(paramName, event.getReport().getParamsMap().get(paramName));
+        if(event.getReport().getParamsMap() != null) {
+            for (String paramName : event.getReport().getParamsMap().keySet()) {
+                previousParamsMap.put(paramName, event.getReport().getParamsMap().get(paramName));
+            }
         }
         history.setPreviousParamsMap(previousParamsMap);
 

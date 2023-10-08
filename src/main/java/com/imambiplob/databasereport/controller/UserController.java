@@ -42,6 +42,31 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
+    @GetMapping("/create/view")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
+    public ModelAndView createUser() {
+        ModelAndView mav = new ModelAndView("create-user-form");
+        UserDTO user = new UserDTO();
+        mav.addObject("user", user);
+
+        return mav;
+    }
+
+    @PostMapping("/createUser")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
+    public String createUser(@Valid @ModelAttribute UserDTO userDTO) {
+
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+        user.setRoles(userDTO.getRoles());
+
+        return "redirect:/api/reports/view";
+    }
+
     @GetMapping("/login/view")
     public ModelAndView login() {
 

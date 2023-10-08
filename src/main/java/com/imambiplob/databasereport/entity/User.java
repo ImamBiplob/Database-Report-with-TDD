@@ -40,13 +40,13 @@ public class User {
     @NotBlank(message = "Role must not be blank")
     private String roles;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
-    private List<ReportExecutionHistory> executionHistoryList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
-    private List<Report> reportList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
-    private List<ScheduledReport> scheduledReportList;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
+//    private List<ReportExecutionHistory> executionHistoryList;
+//
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
+//    private List<Report> reportList;
+//
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
+//    private List<ScheduledReport> scheduledReportList;
 
 }
