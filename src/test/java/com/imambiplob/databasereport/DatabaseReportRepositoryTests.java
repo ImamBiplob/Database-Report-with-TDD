@@ -27,7 +27,6 @@ public class DatabaseReportRepositoryTests {
     void setup() {
 //        reportRepository.deleteAll();
         if (userRepository.findUserByUsername("admin") != null) {
-            reportRepository.deleteAllByReportCreatorId(userRepository.findUserByUsername("admin").getId());
             userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
         }
 

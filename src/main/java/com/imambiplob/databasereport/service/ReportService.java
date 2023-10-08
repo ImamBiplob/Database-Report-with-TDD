@@ -20,6 +20,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -152,7 +154,11 @@ public class ReportService {
 
         Report report = reportRepository.findReportById(id);
 
-        String filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+        String filePath;
+        if(report.isScheduled())
+            filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+        else
+            filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
 
         RunResult runResult = performExecution(report, filePath);
 
@@ -187,7 +193,9 @@ public class ReportService {
 
         MultipartFile multipartFile = new MultipartFileImpl(file);
 
-        publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if(attributes != null)
+            publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
 
         RunResult runResult = new RunResult();
         runResult.setColumns(columns);

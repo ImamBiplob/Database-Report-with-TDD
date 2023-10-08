@@ -42,10 +42,10 @@ public class User {
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportExecutor")
 //    private List<ReportExecutionHistory> executionHistoryList;
-//
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
-//    private List<Report> reportList;
-//
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
+    private List<Report> reportList;
+
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportCreator")
 //    private List<ScheduledReport> scheduledReportList;
 
