@@ -29,4 +29,6 @@ public class ScheduledReport extends Report {
 
     private String emailAddress;
 
+    private String cronExpression;
+
 }

@@ -98,7 +98,7 @@ public class UserController {
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
             cookie.setPath("/api");
-            cookie.setDomain("report.jotno.dev");
+            cookie.setDomain("localhost");
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
@@ -114,7 +114,7 @@ public class UserController {
                 if ("token".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/api");
-                    cookie.setDomain("report.jotno.dev");
+                    cookie.setDomain("localhost");
                     response.addCookie(cookie);
                     break;
                 }

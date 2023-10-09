@@ -50,4 +50,6 @@ public class ReportView implements Serializable {
 
     private String emailAddress;
 
+    private String cronExpression;
+
 }

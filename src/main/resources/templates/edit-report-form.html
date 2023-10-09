@@ -28,7 +28,7 @@
             <div>
                 <label>Report Title:</label>
                 <input class="form-control w-100 mb-4" type="text" th:field="*{reportName}"
-                       placeholder="Enter Report Name" required="required"/>
+                       placeholder="Enter Report Title" required="required"/>
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
@@ -70,9 +70,13 @@
                 <label for="time">Time:</label>
                 <input type="text" id="time" th:field="*{time}" placeholder="HH:mm"/>
             </div>
-            <div class="mb-4" id="emailField" style="display: none;">
+            <div class="mb-2" id="emailField" style="display: none;">
                 <label for="email">Email Address:</label>
                 <input type="text" id="email" th:field="*{emailAddress}" placeholder="Enter Email Address"/>
+            </div>
+            <div class="mb-4" id="cronField" style="display: none;">
+                <label for="cron">CRON Expression:</label>
+                <input type="text" id="cron" th:field="*{cronExpression}" placeholder="Enter CRON Expression"/>
             </div>
 
             <div id="params-container">
@@ -130,6 +134,7 @@
         const yearlyField = document.getElementById("yearlyField");
         const timeField = document.getElementById("timeField");
         const emailField = document.getElementById("emailField");
+        const cronField = document.getElementById("cronField");
 
         if (scheduledCheckbox.checked) {
             dailyField.style.display = "block";
@@ -138,6 +143,7 @@
             yearlyField.style.display = "block";
             timeField.style.display = "block";
             emailField.style.display = "block";
+            cronField.style.display = "block";
         } else {
             dailyField.style.display = "none";
             weeklyField.style.display = "none";
@@ -145,6 +151,7 @@
             yearlyField.style.display = "none";
             timeField.style.display = "none";
             emailField.style.display = "none";
+            cronField.style.display = "none";
         }
 
     }
@@ -156,6 +163,7 @@
         const yearlyField = document.getElementById("yearlyField");
         const timeField = document.getElementById("timeField");
         const emailField = document.getElementById("emailField");
+        const cronField = document.getElementById("cronField");
 
         dailyField.style.display = "block";
         weeklyField.style.display = "block";
@@ -163,6 +171,7 @@
         yearlyField.style.display = "block";
         timeField.style.display = "block";
         emailField.style.display = "block";
+        cronField.style.display = "block";
     }
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
