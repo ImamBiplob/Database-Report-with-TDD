@@ -12,9 +12,12 @@ import com.imambiplob.databasereport.repository.UserRepository;
 import com.imambiplob.databasereport.util.Converter;
 import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,34 +33,77 @@ public class ScheduledReportService {
     private final ReportService reportService;
     private final EmailService emailService;
     private final ApplicationEventPublisher publisher;
+    private final TaskScheduler taskScheduler;
 
-    public ScheduledReportService(ReportRepository reportRepository, ScheduledReportRepository scheduledReportRepository, UserRepository userRepository, ReportService reportService, EmailService emailService, ApplicationEventPublisher publisher) {
+    public ScheduledReportService(ReportRepository reportRepository, ScheduledReportRepository scheduledReportRepository, UserRepository userRepository, ReportService reportService, EmailService emailService, ApplicationEventPublisher publisher, TaskScheduler taskScheduler) {
         this.reportRepository = reportRepository;
         this.scheduledReportRepository = scheduledReportRepository;
         this.userRepository = userRepository;
         this.reportService = reportService;
         this.emailService = emailService;
         this.publisher = publisher;
+        this.taskScheduler = taskScheduler;
     }
 
-    @Scheduled(cron = "${interval-in-cron}")
     @Transactional
-    public void runReport() {
-
+    public void delegateScheduledReportsToTaskScheduler() {
         List<ScheduledReport> reports = scheduledReportRepository.findAll();
 
         for (ScheduledReport report : reports) {
-            String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
-
-            reportService.performExecution(report, filePath);
-
-            EmailDetails emailDetails = new EmailDetails();
-            emailDetails.setAttachment(filePath);
-            emailDetails.setSubject("Report of " + report.getReportName());
-            emailDetails.setRecipient("imamhbiplob@gmail.com");
-            emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
-            emailService.sendMailWithAttachment(emailDetails);
+            String cronExpression = report.getCronExpression();
+            taskScheduler.schedule(() -> runReport(report), new CronTrigger(cronExpression));
         }
+        System.out.println("Delegated to Task Scheduler Successfully");
+    }
+
+    @Scheduled(fixedRate = 3600000) // every hour
+    @Transactional
+    public void runDailyReports() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isDaily()) {
+                LocalTime reportTime = report.getTime();
+                LocalTime currentTime = LocalTime.now();
+                if (reportTime.getHour() == currentTime.getHour()) {
+                    runReport(report);
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "@monthly") // every month
+    @Transactional
+    public void runMonthlyReports() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isMonthly()) {
+                LocalTime reportTime = report.getTime();
+                LocalTime currentTime = LocalTime.now();
+                if (reportTime.getHour() == currentTime.getHour()) {
+                    runReport(report);
+                }
+            }
+        }
+    }
+
+    //@Scheduled(cron = "${interval-in-cron}")
+    @Transactional
+    public void runReport(ScheduledReport report) {
+
+        String filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
+
+        reportService.performExecution(report, filePath);
+
+        EmailDetails emailDetails = new EmailDetails();
+        emailDetails.setAttachment(filePath);
+        emailDetails.setSubject("Report of " + report.getReportName());
+        emailDetails.setRecipient(report.getEmailAddress());
+        emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
+        emailService.sendMailWithAttachment(emailDetails);
+
+        System.out.println("Report Execution Completed");
 
     }
 
@@ -115,6 +161,7 @@ public class ScheduledReportService {
         scheduledReport.setMonthly(reportDTO.isMonthly());
         scheduledReport.setYearly(reportDTO.isYearly());
         scheduledReport.setEmailAddress(reportDTO.getEmailAddress());
+        scheduledReport.setCronExpression(reportDTO.getCronExpression());
         scheduledReport.getParamsMap().remove("");
 
         return convertScheduledReportToScheduledReportDTO(scheduledReportRepository.save(scheduledReport));
