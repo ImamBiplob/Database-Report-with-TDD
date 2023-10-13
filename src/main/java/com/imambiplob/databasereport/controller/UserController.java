@@ -23,6 +23,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Controller
@@ -49,6 +51,7 @@ public class UserController {
         ModelAndView mav = new ModelAndView("create-user-form");
         UserDTO user = new UserDTO();
         mav.addObject("user", user);
+        mav.addObject("roles", Arrays.asList("SYS_ROOT", "DEVELOPER", "USER"));
 
         return mav;
     }
@@ -63,7 +66,7 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
-        user.setRoles(userDTO.getRoles());
+        user.setRoles(String.join(",", userDTO.getRoles()));
 
         userRepository.save(user);
 
@@ -157,7 +160,7 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
-        user.setRoles(userDTO.getRoles());
+        user.setRoles(String.join(",", userDTO.getRoles()));
 
         return userRepository.save(user);
     }

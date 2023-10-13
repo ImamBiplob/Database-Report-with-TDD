@@ -19,7 +19,7 @@
         <h3>Create User</h3>
         <hr/>
 
-        <form id="loginForm" th:action="@{/api/users/createUser}" method="post">
+        <form id="loginForm" th:action="@{/api/users/createUser}" method="post" onsubmit="return validateForm()">
 
             <label for="name">Name:</label>
             <input class="form-control w-100 mb-4" type="text" th:field="*{name}" id="name" name="name"
@@ -40,7 +40,11 @@
             <input class="form-control w-100 mb-4" type="text" th:field="*{phone}" id="phone" name="phone"/>
 
             <label for="roles">Roles:</label>
-            <input class="form-control w-100 mb-4" type="text" th:field="*{roles}" id="roles" name="roles" required/>
+            <div th:each="role : ${roles}" id="roles" class="form-control w-100 mb-3">
+                <input type="checkbox" th:value="${role}" th:field="*{roles}" name="roles"/>
+                <label th:text="${role}"></label>
+                <br/>
+            </div>
 
             <button id="loginButton" class="btn btn-primary shadow-lg" style="width: 100px;" type="submit">Create
             </button>
@@ -56,6 +60,23 @@
 
 </div>
 
+<script>
+    function validateForm() {
+        const checkboxes = document.getElementsByName('roles');
+        let checked = false;
+        for (let i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                checked = true;
+                break;
+            }
+        }
+        if (!checked) {
+            alert('Please select at least one role');
+            return false;
+        }
+        return true;
+    }
+</script>
 <script>
     function goBack() {
         window.history.back();
