@@ -34,6 +34,7 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final String DOMAIN = "localhost";
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
@@ -98,7 +99,7 @@ public class UserController {
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
             cookie.setPath("/api");
-            cookie.setDomain("report.jotno.dev");
+            cookie.setDomain(DOMAIN);
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
@@ -114,7 +115,7 @@ public class UserController {
                 if ("token".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/api");
-                    cookie.setDomain("report.jotno.dev");
+                    cookie.setDomain(DOMAIN);
                     response.addCookie(cookie);
                     break;
                 }
