@@ -59,7 +59,7 @@ public class UserController {
 
         User user = new User();
         user.setName(userDTO.getName());
-        user.setUsername(userDTO.getUsername());
+        user.setUsername(userDTO.getUsername().toLowerCase());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
@@ -89,11 +89,11 @@ public class UserController {
     public String loginAndRedirect(@Valid @ModelAttribute LoginRequest loginRequest, HttpServletResponse response) {
 
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(), loginRequest.getPassword()));
 
         if (authentication.isAuthenticated()) {
 
-            Cookie cookie = new Cookie("token", jwtService.generateToken(loginRequest.getUsername()));
+            Cookie cookie = new Cookie("token", jwtService.generateToken(loginRequest.getUsername().toLowerCase()));
             int maxAgeInSeconds = (int) TimeUnit.MINUTES.toSeconds(10);
             cookie.setMaxAge(maxAgeInSeconds);
             cookie.setSecure(true);
@@ -135,10 +135,10 @@ public class UserController {
         createEndUser();
 
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(), loginRequest.getPassword()));
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtService.generateToken(loginRequest.getUsername()));
+        loginResponse.setToken(jwtService.generateToken(loginRequest.getUsername().toLowerCase()));
 
         if (authentication.isAuthenticated())
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
@@ -153,7 +153,7 @@ public class UserController {
 
         User user = new User();
         user.setName(userDTO.getName());
-        user.setUsername(userDTO.getUsername());
+        user.setUsername(userDTO.getUsername().toLowerCase());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
