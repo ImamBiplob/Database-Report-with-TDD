@@ -9,11 +9,13 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
+//@RestController
 @RequestMapping("api/reports/scheduled")
 public class ScheduledReportController {
 
@@ -29,7 +31,7 @@ public class ScheduledReportController {
     @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> addReport(@Valid @RequestBody ScheduledReportDTO reportDTO) throws IllegalQueryException {
 
-        if(reportDTO.getQuery().toLowerCase().contains("drop"))
+        if (reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
         return new ResponseEntity<>(reportService.addReport(reportDTO, jwtAuthFilter.getCurrentUser()), HttpStatus.CREATED);
@@ -47,10 +49,10 @@ public class ScheduledReportController {
     @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER')")
     public ResponseEntity<?> updateReport(@Valid @RequestBody ScheduledReportDTO reportDTO, @PathVariable long id) throws ReportNotFoundException, IllegalQueryException {
 
-        if(reportService.getReportById(id) == null)
+        if (reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
-        if(reportDTO.getQuery().toLowerCase().contains("drop"))
+        if (reportDTO.getQuery().toLowerCase().contains("drop"))
             throw new IllegalQueryException("DON'T YOU DARE DROP THAT!!!");
 
         return new ResponseEntity<>(reportService.updateReport(reportDTO, id, jwtAuthFilter.getCurrentUser()), HttpStatus.OK);
@@ -61,11 +63,19 @@ public class ScheduledReportController {
     @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> deleteReport(@PathVariable long id) throws ReportNotFoundException {
 
-        if(reportService.getReportById(id) == null)
+        if (reportService.getReportById(id) == null)
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
         return new ResponseEntity<>(reportService.deleteReport(id), HttpStatus.OK);
 
+    }
+
+    @GetMapping("/delegateReportsToTaskScheduler")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
+    public String delegateReportsToTaskScheduler() {
+        reportService.delegateScheduledReportsToTaskScheduler();
+
+        return "redirect:/api/reports/scheduled/view";
     }
 
 }

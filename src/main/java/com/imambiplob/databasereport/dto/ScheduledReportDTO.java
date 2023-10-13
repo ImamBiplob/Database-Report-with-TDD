@@ -28,4 +28,6 @@ public class ScheduledReportDTO extends ReportDTO implements Serializable {
 
     private String emailAddress;
 
+    private String cronExpression;
+
 }

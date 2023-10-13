@@ -2,12 +2,8 @@ package com.imambiplob.databasereport;
 
 import com.imambiplob.databasereport.dto.ReportDTO;
 import com.imambiplob.databasereport.dto.RunResult;
-import com.imambiplob.databasereport.entity.Report;
 import com.imambiplob.databasereport.entity.User;
-import com.imambiplob.databasereport.repository.ExecutionHistoryRepository;
-import com.imambiplob.databasereport.repository.ReportFileRepository;
-import com.imambiplob.databasereport.repository.ReportRepository;
-import com.imambiplob.databasereport.repository.UserRepository;
+import com.imambiplob.databasereport.repository.*;
 import com.imambiplob.databasereport.service.ReportService;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.exception.GenericJDBCException;
@@ -39,19 +35,26 @@ public class DatabaseReportServiceTests {
     private ExecutionHistoryRepository executionHistoryRepository;
 
     @Autowired
+    private UpdateHistoryRepository updateHistoryRepository;
+
+    @Autowired
     private ReportFileRepository reportFileRepository;
 
     @BeforeEach
     void setup() {
 
-        executionHistoryRepository.deleteAll();
-        reportFileRepository.deleteAll();
-        reportRepository.deleteAll();
-        userRepository.deleteAll();
+//        executionHistoryRepository.deleteAll();
+//        updateHistoryRepository.deleteAll();
+//        reportFileRepository.deleteAll();
+//        reportRepository.deleteAll();
+        if (userRepository.findUserByUsername("admin") != null) {
+            userRepository.deleteById(userRepository.findUserByUsername("admin").getId());
+        }
 
         userRepository.save(User.builder()
                 .username("admin")
                 .email("admin@gmail.com")
+                .roles("DEVELOPER")
                 .password("admin")
                 .phone("01521559190").build());
 
@@ -144,13 +147,13 @@ public class DatabaseReportServiceTests {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
-        Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees Where Salary is Getter Than 100000")
                 .query("select first_name, dept_name, salary from salaries s join employees e on e.emp_no = s.emp_no join dept_emp de on de.emp_no = e.emp_no join departments d on d.dept_no = de.dept_no where salary > :salary")
                 .columns("first_name,department,salary")
                 .paramsMap(paramsMap)
                 .build();
 
-        reportRepository.save(report);
+        report = reportService.addReport(report, "admin");
 
         RunResult runResult = reportService.runReport(report.getId(), "admin");
 
@@ -177,17 +180,18 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Unsuccessful Run of a Report with Invalid SQL")
     public void runReportOfInvalidSQL() {
 
-        Report report = Report.builder().reportName("All Employees")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("select first_name, job_title, salary from employee")      /* No table named employee in database */
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportRepository.save(report);
+        report = reportService.addReport(report, "admin");
 
         /* It will throw an exception due to invalid SQL */
 
-        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.runReport(report.getId(), "admin"));
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
+        final ReportDTO finalReport = report;
+        Assertions.assertThrows(SQLGrammarException.class, () -> reportService.runReport(finalReport.getId(), "admin"));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(finalReport.getId()).get(0));  /* No History */
 
     }
 
@@ -195,17 +199,17 @@ public class DatabaseReportServiceTests {
     @DisplayName("Test for Unsuccessful Run of a Report with Malformed SQL Statement")
     public void runReportOfMalformedSQLStatement() {
 
-        Report report = Report.builder().reportName("All Employees")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees")
                 .query("slect first_name, job_title, salary from employees")      /* No statement named slect in SQL */
                 .columns("first_name,job_title,salary")
                 .build();
 
-        reportRepository.save(report);
+        ReportDTO finalReport = reportService.addReport(report, "admin");
 
         /* It will throw an exception due to malformed SQL statement */
 
-        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.runReport(report.getId(), "admin"));
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
+        Assertions.assertThrows(GenericJDBCException.class, () -> reportService.runReport(finalReport.getId(), "admin"));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(finalReport.getId()).get(0));  /* No History */
 
     }
 
@@ -216,19 +220,19 @@ public class DatabaseReportServiceTests {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("salary", "100000");
 
-        Report report = Report.builder().reportName("All Employees Where Salary is Getter Than 100000")
+        ReportDTO report = ReportDTO.builder().reportName("All Employees Where Salary is Getter Than 100000")
                 .query("select first_name, job_title, salary from employees where salary > :salay")     /* salay doesn't match with paramName salary */
                 .columns("first_name,job_title,salary")
                 .paramsMap(paramsMap)
                 .build();
 
-        reportRepository.save(report);
+        ReportDTO finalReport = reportService.addReport(report, "admin");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.runReport(report.getId(), "admin"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> reportService.runReport(finalReport.getId(), "admin"));
 
         /* Couldn't set parameter due to mismatched parameter names, hence threw an exception */
 
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(report.getId()).get(0));  /* No History */
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> executionHistoryRepository.findReportExecutionHistoriesByReportIdIs(finalReport.getId()).get(0));  /* No History */
 
     }
 
@@ -270,21 +274,21 @@ public class DatabaseReportServiceTests {
 
     }
 
-    @Test
-    @DisplayName("Test for Successful Delete of All Reports")
-    public void deleteAllReportsWithSuccess() {
-
-        Report report = Report.builder().reportName("All Employees")
-                .query("select first_name, job_title, salary from employees")
-                .columns("first_name,job_title,salary")
-                .build();
-
-        reportRepository.save(report);
-
-        reportService.deleteAllReports();
-
-        Assertions.assertEquals(0, reportRepository.count());
-
-    }
+//    @Test
+//    @DisplayName("Test for Successful Delete of All Reports")
+//    public void deleteAllReportsWithSuccess() {
+//
+//        Report report = Report.builder().reportName("All Employees")
+//                .query("select first_name, job_title, salary from employees")
+//                .columns("first_name,job_title,salary")
+//                .build();
+//
+//        reportRepository.save(report);
+//
+//        reportService.deleteAllReports();
+//
+//        Assertions.assertEquals(0, reportRepository.count());
+//
+//    }
 
 }

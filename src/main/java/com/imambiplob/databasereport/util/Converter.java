@@ -97,6 +97,7 @@ public class Converter {
         reportView.setMonthly(reportDTO.isMonthly());
         reportView.setYearly(reportDTO.isYearly());
         reportView.setTime(reportDTO.getTime());
+        reportView.setCronExpression(reportDTO.getCronExpression());
 
         return reportView;
 
@@ -133,6 +134,7 @@ public class Converter {
         reportDTO.setMonthly(reportView.isMonthly());
         reportDTO.setYearly(reportView.isYearly());
         reportDTO.setTime(reportView.getTime());
+        reportDTO.setCronExpression(reportView.getCronExpression());
 
         return reportDTO;
 
@@ -174,7 +176,7 @@ public class Converter {
         report.setParamsMap(reportDTO.getParamsMap());
         report.setReportCreator(user);
         report.setScheduled(reportDTO.isScheduled());
-        report.getParamsMap().remove("");
+//        report.getParamsMap().remove("");
 
         return report;
 
@@ -203,6 +205,7 @@ public class Converter {
         reportDTO.setMonthly(report.isMonthly());
         reportDTO.setYearly(report.isYearly());
         reportDTO.setEmailAddress(report.getEmailAddress());
+        reportDTO.setCronExpression(report.getCronExpression());
 
         return reportDTO;
 
@@ -229,6 +232,7 @@ public class Converter {
         report.setYearly(reportDTO.isYearly());
         report.setEmailAddress(report.getEmailAddress());
         report.getParamsMap().remove("");
+        report.setCronExpression(reportDTO.getCronExpression());
 
         return report;
 

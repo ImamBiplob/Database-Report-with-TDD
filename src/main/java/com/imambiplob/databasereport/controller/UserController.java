@@ -34,6 +34,7 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final String DOMAIN = "localhost";
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
@@ -42,10 +43,39 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
+    @GetMapping("/create/view")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
+    public ModelAndView createUser() {
+        ModelAndView mav = new ModelAndView("create-user-form");
+        UserDTO user = new UserDTO();
+        mav.addObject("user", user);
+
+        return mav;
+    }
+
+    @PostMapping("/createUser")
+    @PreAuthorize("hasAuthority('SYS_ROOT')")
+    public String createUser(@Valid @ModelAttribute UserDTO userDTO) {
+
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+        user.setRoles(userDTO.getRoles());
+
+        userRepository.save(user);
+
+        return "redirect:/api/reports/view";
+    }
+
     @GetMapping("/login/view")
     public ModelAndView login() {
 
         createSysRoot();
+        createDeveloper();
+        createEndUser();
 
         ModelAndView mav = new ModelAndView("login-form");
         LoginRequest loginRequest = new LoginRequest();
@@ -69,13 +99,11 @@ public class UserController {
             cookie.setSecure(true);
             cookie.setHttpOnly(true);
             cookie.setPath("/api");
-            cookie.setDomain("localhost");
+            cookie.setDomain(DOMAIN);
             response.addCookie(cookie);
 
             return "redirect:/api/reports/view";
-        }
-
-        else throw new UsernameNotFoundException("Invalid User Request!!!");
+        } else throw new UsernameNotFoundException("Invalid User Request!!!");
     }
 
     @GetMapping("/logout")
@@ -87,7 +115,7 @@ public class UserController {
                 if ("token".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/api");
-                    cookie.setDomain("localhost");
+                    cookie.setDomain(DOMAIN);
                     response.addCookie(cookie);
                     break;
                 }
@@ -102,13 +130,17 @@ public class UserController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateAndGetToken(@Valid @RequestBody LoginRequest loginRequest) {
 
+        createSysRoot();
+        createDeveloper();
+        createEndUser();
+
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwtService.generateToken(loginRequest.getUsername()));
 
-        if(authentication.isAuthenticated())
+        if (authentication.isAuthenticated())
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
         else throw new UsernameNotFoundException("Invalid User Request!!!");
@@ -133,13 +165,13 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SYS_ROOT')")
     public ResponseEntity<?> getUser(@PathVariable long id) {
-        if(userRepository.findById(id).isPresent())
+        if (userRepository.findById(id).isPresent())
             return new ResponseEntity<>(userRepository.findById(id).get(), HttpStatus.OK);
         return new ResponseEntity<>(new ResponseMessage("User with ID: " + id + " doesn't exist"), HttpStatus.NOT_FOUND);
     }
 
     public void createSysRoot() {
-        if(userRepository.findUserByUsername("imambiplob") == null) {
+        if (userRepository.findUserByUsername("imambiplob") == null) {
             User user = new User();
             user.setName("Imam Hossain");
             user.setUsername("imambiplob");
@@ -147,6 +179,34 @@ public class UserController {
             user.setEmail("imamhbiplob@gmail.com");
             user.setPhone("01521559190");
             user.setRoles("SYS_ROOT,DEVELOPER");
+
+            userRepository.save(user);
+        }
+    }
+
+    public void createDeveloper() {
+        if (userRepository.findUserByUsername("developer") == null) {
+            User user = new User();
+            user.setName("Developer");
+            user.setUsername("developer");
+            user.setPassword(passwordEncoder.encode("dev123"));
+            user.setEmail("developer@jotno.net");
+            user.setPhone("01xxxxxxxxx");
+            user.setRoles("DEVELOPER");
+
+            userRepository.save(user);
+        }
+    }
+
+    public void createEndUser() {
+        if (userRepository.findUserByUsername("user") == null) {
+            User user = new User();
+            user.setName("user");
+            user.setUsername("user");
+            user.setPassword(passwordEncoder.encode("user123"));
+            user.setEmail("user@jotno.net");
+            user.setPhone("01xxxxxxxxx");
+            user.setRoles("USER");
 
             userRepository.save(user);
         }

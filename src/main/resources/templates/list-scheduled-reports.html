@@ -21,7 +21,11 @@
 
     <div class="d-flex justify-content-between align-items-center">
         <h3>List of Reports</h3>
-        <a th:href="@{/api/users/logout}" class="btn btn-outline-dark shadow">Log Out</a>
+        <div>
+            <a sec:authorize="hasAnyAuthority('SYS_ROOT')" th:href="@{/api/users/create/view}"
+               class="btn btn-outline-success shadow">Create User</a>
+            <a th:href="@{/api/users/logout}" class="btn btn-outline-dark shadow ms-1">Log Out</a>
+        </div>
     </div>
 
     <hr/>
@@ -30,7 +34,10 @@
             Report</a>
         <p class="fw-medium">Current User: <span class="fw-bold" sec:authentication="name"></span> as <span
                 class="fw-bold" sec:authentication="authorities"></span></p>
-        <a th:href="@{/api/reports/view}" class="btn btn-outline-primary shadow">Back to List of Reports</a>
+        <div>
+            <a th:href="@{/api/reports/scheduled/delegateReportsToTaskScheduler}" class="btn btn-outline-primary shadow">Delegate To Scheduler</a>
+            <a th:href="@{/api/reports/view}" class="btn btn-outline-primary shadow">Back to List of Reports</a>
+        </div>
     </div>
     <hr/>
 
