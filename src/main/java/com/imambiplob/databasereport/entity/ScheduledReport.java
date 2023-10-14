@@ -23,6 +23,8 @@ public class ScheduledReport extends Report {
 
     private boolean monthly;
 
+    private String weekDay;
+
     private boolean yearly;
 
     private LocalTime time;

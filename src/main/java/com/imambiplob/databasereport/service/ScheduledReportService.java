@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.imambiplob.databasereport.util.Converter.convertScheduledReportDTOToScheduledReport;
@@ -57,6 +58,7 @@ public class ScheduledReportService {
 //    }
 
     @Scheduled(fixedRate = 3600000) // every hour
+    //@Scheduled(fixedRate = 60000)
     @Transactional
     public void runDailyReports() {
         List<ScheduledReport> reports = scheduledReportRepository.findAll();
@@ -67,6 +69,24 @@ public class ScheduledReportService {
                 LocalTime currentTime = LocalTime.now();
                 if (reportTime.getHour() == currentTime.getHour()) {
                     runReport(report);
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 * * ? * SUN") // every hour on sunday
+    @Transactional
+    public void runWeeklyReports() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "SUNDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
                 }
             }
         }
@@ -158,6 +178,7 @@ public class ScheduledReportService {
         scheduledReport.setTime(reportDTO.getTime());
         scheduledReport.setDaily(reportDTO.isDaily());
         scheduledReport.setWeekly(reportDTO.isWeekly());
+        scheduledReport.setWeekDay(reportDTO.getWeekDay());
         scheduledReport.setMonthly(reportDTO.isMonthly());
         scheduledReport.setYearly(reportDTO.isYearly());
         scheduledReport.setEmailAddress(reportDTO.getEmailAddress());

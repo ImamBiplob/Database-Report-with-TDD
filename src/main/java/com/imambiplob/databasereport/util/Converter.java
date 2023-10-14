@@ -94,6 +94,7 @@ public class Converter {
         reportView.setScheduled(reportDTO.isScheduled());
         reportView.setDaily(reportDTO.isDaily());
         reportView.setWeekly(reportDTO.isWeekly());
+        reportView.setWeekDay(reportDTO.getWeekDay());
         reportView.setMonthly(reportDTO.isMonthly());
         reportView.setYearly(reportDTO.isYearly());
         reportView.setTime(reportDTO.getTime());
@@ -131,6 +132,7 @@ public class Converter {
         reportDTO.setScheduled(reportView.isScheduled());
         reportDTO.setDaily(reportView.isDaily());
         reportDTO.setWeekly(reportView.isWeekly());
+        reportDTO.setWeekDay(reportView.getWeekDay());
         reportDTO.setMonthly(reportView.isMonthly());
         reportDTO.setYearly(reportView.isYearly());
         reportDTO.setTime(reportView.getTime());
@@ -202,6 +204,7 @@ public class Converter {
         reportDTO.setTime(report.getTime());
         reportDTO.setDaily(report.isDaily());
         reportDTO.setWeekly(report.isWeekly());
+        reportDTO.setWeekDay(report.getWeekDay());
         reportDTO.setMonthly(report.isMonthly());
         reportDTO.setYearly(report.isYearly());
         reportDTO.setEmailAddress(report.getEmailAddress());
@@ -228,9 +231,10 @@ public class Converter {
         report.setTime(reportDTO.getTime());
         report.setDaily(reportDTO.isDaily());
         report.setWeekly(reportDTO.isWeekly());
+        report.setWeekDay(reportDTO.getWeekDay());
         report.setMonthly(reportDTO.isMonthly());
         report.setYearly(reportDTO.isYearly());
-        report.setEmailAddress(report.getEmailAddress());
+        report.setEmailAddress(reportDTO.getEmailAddress());
         report.getParamsMap().remove("");
         report.setCronExpression(reportDTO.getCronExpression());
 

@@ -42,6 +42,8 @@ public class ReportView implements Serializable {
 
     private boolean weekly;
 
+    private String weekDay;
+
     private boolean monthly;
 
     private boolean yearly;
