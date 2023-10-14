@@ -196,7 +196,14 @@ public class ReportController {
         RunResult runResult = reportService.runReport(id, jwtAuthFilter.getCurrentUser());
 
         ModelAndView mav = new ModelAndView("list-run-result");
-        mav.addObject("runResult", runResult);
+        if(runResult.getResults().size() > 10000){
+            List results = runResult.getResults().subList(0, 10000);
+            runResult.setResults(results);
+            mav.addObject("runResult", runResult);
+        }
+        else {
+            mav.addObject("runResult", runResult);
+        }
         mav.addObject("report", reportService.getReportById(id));
 
         return mav;
