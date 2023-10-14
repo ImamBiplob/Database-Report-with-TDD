@@ -74,9 +74,27 @@ public class ScheduledReportService {
         }
     }
 
-    @Scheduled(cron = "0 * * ? * SUN") // every hour on sunday
+    @Scheduled(cron = "0 0 * ? * SAT") // every hour on saturday
     @Transactional
-    public void runWeeklyReports() {
+    public void runWeeklyReportsOfSaturday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "SATURDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * ? * SUN") // every hour on sunday
+    @Transactional
+    public void runWeeklyReportsOfSunday() {
         List<ScheduledReport> reports = scheduledReportRepository.findAll();
 
         for (ScheduledReport report : reports) {
@@ -92,13 +110,119 @@ public class ScheduledReportService {
         }
     }
 
-    @Scheduled(cron = "@monthly") // every month
+    @Scheduled(cron = "0 0 * ? * MON") // every hour on monday
+    @Transactional
+    public void runWeeklyReportsOfMonday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "MONDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * ? * TUE") // every hour on tuesday
+    @Transactional
+    public void runWeeklyReportsOfTuesday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "TUESDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * ? * WED") // every hour on wednesday
+    @Transactional
+    public void runWeeklyReportsOfWednesday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "WEDNESDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * ? * THU") // every hour on thursday
+    @Transactional
+    public void runWeeklyReportsOfThursday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "THURSDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * ? * FRI") // every hour on friday
+    @Transactional
+    public void runWeeklyReportsOfFriday() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isWeekly()) {
+                if(Objects.equals(report.getWeekDay(), "FRIDAY")) {
+                    LocalTime reportTime = report.getTime();
+                    LocalTime currentTime = LocalTime.now();
+                    if (reportTime.getHour() == currentTime.getHour()) {
+                        runReport(report);
+                    }
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 8 1 * ?") // every month
     @Transactional
     public void runMonthlyReports() {
         List<ScheduledReport> reports = scheduledReportRepository.findAll();
 
         for (ScheduledReport report : reports) {
             if (report.isMonthly()) {
+                LocalTime reportTime = report.getTime();
+                LocalTime currentTime = LocalTime.now();
+                if (reportTime.getHour() == currentTime.getHour()) {
+                    runReport(report);
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 8 1 1 *") // every year
+    @Transactional
+    public void runYearlyReports() {
+        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+
+        for (ScheduledReport report : reports) {
+            if (report.isYearly()) {
                 LocalTime reportTime = report.getTime();
                 LocalTime currentTime = LocalTime.now();
                 if (reportTime.getHour() == currentTime.getHour()) {
@@ -120,7 +244,7 @@ public class ScheduledReportService {
         emailDetails.setAttachment(filePath);
         emailDetails.setSubject("Report of " + report.getReportName());
         emailDetails.setRecipient(report.getEmailAddress());
-        emailDetails.setMsgBody("Hello,\n\nReport file of this month is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
+        emailDetails.setMsgBody("Hello,\n\nReport file is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
         emailService.sendMailWithAttachment(emailDetails);
 
         System.out.println("Report Execution Completed");
