@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Edit Report</title>
+    <title>Update Parameter</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
           rel="stylesheet"
@@ -18,12 +18,13 @@
 
 <div class="container my-5" th:object="${report}">
 
-    <h3>Edit Report</h3>
+    <h3>Update Parameter</h3>
     <hr/>
 
     <div class="my-2 w-100">
 
-        <form class="w-100" th:action="@{/api/reports/updateReport}" method="post" th:object="${report}">
+        <form class="w-100" th:action="@{/api/reports/updateParam}" method="post" th:object="${report}">
+
 
             <div>
                 <label>Report Title:</label>
@@ -32,22 +33,14 @@
                 <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
             </div>
 
-            <div>
-                <label>SQL Query:</label>
-                <textarea class="form-control w-100 mb-4" th:field="*{query}" placeholder="Enter SQL Query"
-                          required="required"></textarea>
-                <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
-            </div>
+            <input type="hidden" class="form-control w-100 mb-4" th:field="*{query}" placeholder="Enter SQL Query"
+                   required="required">
 
-            <div>
-                <label>Columns:</label>
-                <input class="form-control w-100 mb-4" type="text" th:field="*{columns}"
-                       placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
-                <span th:if="${#fields.hasErrors('reportName')}" th:errors="*{reportName}"></span>
-            </div>
+            <input type="hidden" class="form-control w-100 mb-4" th:field="*{columns}"
+                   placeholder="Enter Column Names Separated by Comma(,)" required="required"/>
 
-            <label for="scheduled">Scheduled:</label>
-            <input class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}" onchange="toggleFields()"/>
+            <input th:type="hidden" class="mb-2" type="checkbox" id="scheduled" th:field="*{scheduled}"
+                   onchange="toggleFields()"/>
             <a class="btn btn-secondary btn-sm mb-2 ms-2" th:if="${report.scheduled != false}" onclick="showFields()">Expand</a>
 
             <div class="mb-2" id="dailyField" style="display: none;">
@@ -82,24 +75,15 @@
             <div id="params-container">
                 <div class="param-row" th:each="paramItem, paramIndex : *{paramsList}">
 
-                    <label>Parameter Name:</label>
-                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramName}" class="my-1"
+                    <input th:type="hidden" type="text" th:field="*{paramsList[__${paramIndex.index}__].paramName}"
                            placeholder="Enter Parameter Name">
 
-                    <label>Parameter Value:</label>
-                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1"
+                    <label th:text="*{paramsList[__${paramIndex.index}__].paramName}"></label>
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1 form-control w-25"
                            placeholder="Enter Parameter Value">
-
-                    <button type="button" class="remove-param-button btn btn-danger btn-sm m-1 shadow"
-                            onclick="removeParamRow(this)">Remove
-                    </button>
 
                 </div>
             </div>
-
-            <button type="button" class="btn btn-secondary btn-sm my-1 shadow" style="width: 120px; height: 35px;"
-                    onclick="addParamRow()">Add Parameter
-            </button>
 
             <hr/>
 
