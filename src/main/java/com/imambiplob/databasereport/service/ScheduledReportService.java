@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -81,7 +80,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "SATURDAY")) {
+                if (Objects.equals(report.getWeekDay(), "SATURDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -99,7 +98,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "SUNDAY")) {
+                if (Objects.equals(report.getWeekDay(), "SUNDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -117,7 +116,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "MONDAY")) {
+                if (Objects.equals(report.getWeekDay(), "MONDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -135,7 +134,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "TUESDAY")) {
+                if (Objects.equals(report.getWeekDay(), "TUESDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -153,7 +152,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "WEDNESDAY")) {
+                if (Objects.equals(report.getWeekDay(), "WEDNESDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -171,7 +170,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "THURSDAY")) {
+                if (Objects.equals(report.getWeekDay(), "THURSDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -189,7 +188,7 @@ public class ScheduledReportService {
 
         for (ScheduledReport report : reports) {
             if (report.isWeekly()) {
-                if(Objects.equals(report.getWeekDay(), "FRIDAY")) {
+                if (Objects.equals(report.getWeekDay(), "FRIDAY")) {
                     LocalTime reportTime = report.getTime();
                     LocalTime currentTime = LocalTime.now();
                     if (reportTime.getHour() == currentTime.getHour()) {
@@ -247,7 +246,7 @@ public class ScheduledReportService {
         emailDetails.setMsgBody("Hello,\n\nReport file is attached with this email.\n\nThanks,\nImam Hossain\nSquare Health Ltd.");
         emailService.sendMailWithAttachment(emailDetails);
 
-        System.out.println("Report Execution Completed");
+        System.out.println("Scheduled Report Execution Completed of ID: " + report.getId());
 
     }
 

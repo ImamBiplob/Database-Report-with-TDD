@@ -48,7 +48,8 @@
                            placeholder="Enter Parameter Name">
 
                     <label th:text="*{paramsList[__${paramIndex.index}__].paramName}"></label>
-                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}" class="my-1 form-control w-25"
+                    <input type="text" th:field="*{paramsList[__${paramIndex.index}__].paramValue}"
+                           class="my-1 form-control w-25"
                            placeholder="Enter Parameter Value">
 
                 </div>

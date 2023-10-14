@@ -155,7 +155,7 @@ public class ReportService {
         Report report = reportRepository.findReportById(id);
 
         String filePath;
-        if(report.isScheduled())
+        if (report.isScheduled())
             filePath = "scheduledReports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
         else
             filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".csv";
@@ -194,7 +194,7 @@ public class ReportService {
         MultipartFile multipartFile = new MultipartFileImpl(file);
 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if(attributes != null)
+        if (attributes != null)
             publisher.publishEvent(new ReportExecutionEventForFile(this, multipartFile, report));
 
         RunResult runResult = new RunResult();
