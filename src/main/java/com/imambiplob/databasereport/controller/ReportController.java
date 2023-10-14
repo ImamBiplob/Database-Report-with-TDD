@@ -71,6 +71,24 @@ public class ReportController {
 
     }
 
+    @PostMapping("/updateParam")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','USER')")
+    public String updateParam(@ModelAttribute ReportView reportView) {
+
+        if(!reportView.isScheduled()) {
+            ReportDTO reportDTO = convertReportViewToReportDTO(reportView);
+            reportService.updateReport(reportDTO, reportDTO.getId(), jwtAuthFilter.getCurrentUser());
+        }
+
+        else {
+            ScheduledReportDTO reportDTO = convertReportViewToScheduledReportDTO(reportView);
+            scheduledReportService.updateReport(reportDTO, reportDTO.getId(), jwtAuthFilter.getCurrentUser());
+        }
+
+        return "redirect:/api/reports/view/editParamForm/" + reportView.getId();
+
+    }
+
     @GetMapping("/view")
     public ModelAndView getReportsView() {
 
@@ -126,6 +144,29 @@ public class ReportController {
 
         if(report.getParamsList().isEmpty())
             report.setParamsList(List.of(new ParamDTO()));
+
+        mav.addObject("report", report);
+
+        return mav;
+
+    }
+
+    @GetMapping("/view/editParamForm/{reportId}")
+    @PreAuthorize("hasAnyAuthority('SYS_ROOT','DEVELOPER','USER')")
+    public ModelAndView editParamForm(@PathVariable long reportId) throws ReportNotFoundException {
+
+        if(reportService.getReportById(reportId) == null)
+            throw new ReportNotFoundException("Report with ID: " + reportId + " doesn't exist");
+
+        ModelAndView mav = new ModelAndView("edit-param-form");
+
+        ReportView report;
+        if(!reportService.getReportById(reportId).isScheduled()) {
+            report = convertReportDTOToReportView(reportService.getReportById(reportId));
+        }
+        else {
+            report = convertScheduledReportDTOToReportView(scheduledReportService.getReportById(reportId));
+        }
 
         mav.addObject("report", report);
 
