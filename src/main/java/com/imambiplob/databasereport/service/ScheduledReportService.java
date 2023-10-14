@@ -45,16 +45,16 @@ public class ScheduledReportService {
         this.taskScheduler = taskScheduler;
     }
 
-    @Transactional
-    public void delegateScheduledReportsToTaskScheduler() {
-        List<ScheduledReport> reports = scheduledReportRepository.findAll();
-
-        for (ScheduledReport report : reports) {
-            String cronExpression = report.getCronExpression();
-            taskScheduler.schedule(() -> runReport(report), new CronTrigger(cronExpression));
-        }
-        System.out.println("Delegated to Task Scheduler Successfully");
-    }
+//    @Transactional
+//    public void delegateScheduledReportsToTaskScheduler() {
+//        List<ScheduledReport> reports = scheduledReportRepository.findAll();
+//
+//        for (ScheduledReport report : reports) {
+//            String cronExpression = report.getCronExpression();
+//            taskScheduler.schedule(() -> runReport(report), new CronTrigger(cronExpression));
+//        }
+//        System.out.println("Delegated to Task Scheduler Successfully");
+//    }
 
     @Scheduled(fixedRate = 3600000) // every hour
     @Transactional

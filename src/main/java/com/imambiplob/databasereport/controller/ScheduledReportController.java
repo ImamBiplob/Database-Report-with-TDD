@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-//@RestController
+@RestController
 @RequestMapping("api/reports/scheduled")
 public class ScheduledReportController {
 
@@ -70,12 +70,12 @@ public class ScheduledReportController {
 
     }
 
-    @GetMapping("/delegateReportsToTaskScheduler")
-    @PreAuthorize("hasAuthority('SYS_ROOT')")
-    public String delegateReportsToTaskScheduler() {
-        reportService.delegateScheduledReportsToTaskScheduler();
-
-        return "redirect:/api/reports/scheduled/view";
-    }
+//    @GetMapping("/delegateReportsToTaskScheduler")
+//    @PreAuthorize("hasAuthority('SYS_ROOT')")
+//    public String delegateReportsToTaskScheduler() {
+//        reportService.delegateScheduledReportsToTaskScheduler();
+//
+//        return "redirect:/api/reports/scheduled/view";
+//    }
 
 }
