@@ -39,7 +39,10 @@
 
     </table>
 
-    <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download</a>
+    <a th:if="${report.downloadLink != null}" th:href="@{${report.downloadLink}}" class="btn btn-info mt-2 shadow">Download as CSV</a>
+    <object th:attr="data=${filePath}" type="application/pdf" width="100%" height="100%">
+        <p>It appears you don't have a PDF plugin for this browser. No biggie... you can <a th:href="@{${filePath}}">click here to download the PDF file.</a></p>
+    </object>
 
     <hr/>
     <div>

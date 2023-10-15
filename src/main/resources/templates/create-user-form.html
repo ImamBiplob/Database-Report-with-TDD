@@ -40,13 +40,12 @@
             <input class="form-control w-100 mb-4" type="text" th:field="*{phone}" id="phone" name="phone"/>
 
             <label for="roles">Roles:</label>
-            <div th:each="role : ${roles}" id="roles" class="form-control w-100 mb-3">
+            <div th:each="role : ${roles}" id="roles" class="mb-2">
                 <input type="checkbox" th:value="${role}" th:field="*{roles}" name="roles"/>
                 <label th:text="${role}"></label>
-                <br/>
             </div>
 
-            <button id="loginButton" class="btn btn-primary shadow-lg" style="width: 100px;" type="submit">Create
+            <button id="loginButton" class="btn btn-primary shadow-lg mt-2" style="width: 100px;" type="submit">Create
             </button>
 
         </form>

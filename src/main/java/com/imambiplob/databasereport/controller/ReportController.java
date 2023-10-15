@@ -194,6 +194,7 @@ public class ReportController {
             throw new ReportNotFoundException("Report with ID: " + id + " doesn't exist");
 
         RunResult runResult = reportService.runReport(id, jwtAuthFilter.getCurrentUser());
+        ReportDTO report = reportService.getReportById(id);
 
         ModelAndView mav = new ModelAndView("list-run-result");
         if(runResult.getResults().size() > 10000){
@@ -205,7 +206,8 @@ public class ReportController {
             mav.addObject("runResult", runResult);
         }
         mav.addObject("report", reportService.getReportById(id));
-
+        String filePath = "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".pdf";
+        mav.addObject("filePath", filePath);
         return mav;
 
     }

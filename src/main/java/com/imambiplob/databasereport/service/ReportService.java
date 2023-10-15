@@ -25,6 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -43,13 +44,15 @@ public class ReportService {
     private final UserRepository userRepository;
     private final CsvExportService csvExportService;
     private final CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult;
+    private final PdfService pdfService;
 
-    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult) {
+    public ReportService(ApplicationEventPublisher publisher, ReportRepository reportRepository, UserRepository userRepository, CsvExportService csvExportService, CsvExportServiceForSingleColumnResult csvExportServiceForSingleColumnResult, PdfService pdfService) {
         this.publisher = publisher;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.csvExportService = csvExportService;
         this.csvExportServiceForSingleColumnResult = csvExportServiceForSingleColumnResult;
+        this.pdfService = pdfService;
     }
 
     @Transactional
@@ -183,11 +186,13 @@ public class ReportService {
 
             results = getResults(report);
             file = csvExportService.exportQueryResultToCsv(results, filePath, columns);
+            pdfService.writeRunResultToPDF(results, columns, "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".pdf", report.getReportName());
 
         } else {
 
             results = getResults(report);
             file = csvExportServiceForSingleColumnResult.exportQueryResultToCsv(results, filePath, columns);
+            pdfService.writeRunResultToPDFForSingleColumn(results, columns, "reports/" + "#" + report.getId() + " - " + report.getReportName() + ".pdf", report.getReportName());
 
         }
 
